@@ -51,7 +51,7 @@ def analyse():
         if tokenCreated == False:
             print(f"Lexical error in line: {line} colon: {colon}")        #Mostra a linha do erro
             print(f"Error starts in: {charA}")
-            createToken('------MISSING CHARACTER------')                  #Imprime o erro no arquivo de saida
+            createToken('------MISSING TOKEN------')                  #Imprime o erro no arquivo de saida
             charA = file.readline()                                       #Pula a linha com erro
             line += 1                                                     #Adiciona mais um a linha pois ela foi pulada
             colon = 0                                                     #Zera a coluna
@@ -114,7 +114,7 @@ def tokenCharacterSet(charA, file, colon):                 #Encontra conjuntos d
             buff += charB
         if re.match(identifier, buff):                      #Ao acabar verifica o tipo de conjunto
             if buff in list:
-                createToken(buff + '\t' * 2 + 'CHARACTER SET - ARITHMETIC')
+                createToken(buff + '\t' * 2 + 'CHARACTER SET - VARIABLE')
                 tokenCreated = True
             else:
                 createToken(buff + '\t'*2 + 'CHARACTER SET - STRING')

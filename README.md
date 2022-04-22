@@ -3,7 +3,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Este é um compilador desenvolvido em python para leitura de códigos simples escritos para a linguagem C.
 ___
 ## Compiler:
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O arquivo [compiler]() é utilizado apenas para importação e chamada de outros arquivos do compilador, sua função é facilitar o entendimento e a ordem de execução de cada parte do compilador, começando pelo [lexicalAnalyzer](), seguido do [parser]() (Em desenvolvimento) e por fim o [semanticAnalyzer]() (Ainda em desenvolvimento).
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O arquivo [compiler](https://github.com/VitoReis/Ccompiler/blob/main/compiler.py) é utilizado apenas para importação e chamada de outros arquivos do compilador, sua função é facilitar o entendimento e a ordem de execução de cada parte do compilador, começando pelo [lexicalAnalyzer](https://github.com/VitoReis/Ccompiler/blob/main/lexicalAnalyzer.py), seguido do [parser]() (Em desenvolvimento) e por fim o [semanticAnalyzer]() (Ainda em desenvolvimento).
 ___
 
 ## Lexical Analyzer:

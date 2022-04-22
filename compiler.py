@@ -1,0 +1,3 @@
+from lexicalAnalyzer import *
+
+analyse()

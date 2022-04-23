@@ -287,10 +287,10 @@ def tokenLiterals(charA):
         createToken('}' + '\t' * 5 + 'LITERAl')
         tokenCreated = True
     elif charA == ';':
-        createToken(';' + '\t' * 5 + 'SEPARADOR')
+        createToken(';' + '\t' * 5 + 'SEPARATOR')
         tokenCreated = True
     elif charA == ',':
-        createToken(',' + '\t' * 5 + 'SEPARADOR')
+        createToken(',' + '\t' * 5 + 'SEPARATOR')
         tokenCreated = True
     return tokenCreated
 

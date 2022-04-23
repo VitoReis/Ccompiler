@@ -48,7 +48,7 @@ ___
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_**Em desenvolvimento**_
 
 ___
-## Lexical Analyzer
+## Semantic Analyzer
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_**Em desenvolvimento**_
 
 ___

@@ -60,9 +60,8 @@ def analyse():
 
 
 def tokenReservedOrId(charA, file, colon):
-    reservedWordsTuple = {   ('#include'):  'include' + '\t'*4 + 'RESERVED WORD',
-                ('main'):   'main' + '\t'*4 + 'RESERVED WORD',
-                ('void'):   'void' + '\t'*4 + 'RESERVED WORD',
+    reservedWordsTuple = {('void'):   'void' + '\t'*4 + 'RESERVED WORD',
+                ('main'):   'main' + '\t'*4 + 'RESERVED WORD',         
                 ('int'):    'int' + '\t'*4 + 'RESERVED WORD',
                 ('float'):  'float' + '\t'*4 + 'RESERVED WORD',
                 ('char'):   'char' + '\t'*4 + 'RESERVED WORD',

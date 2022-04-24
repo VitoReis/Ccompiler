@@ -17,9 +17,10 @@ ___
 #### &nbsp;&nbsp;&nbsp;Reserved or Id:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Essa função é chamada quando um caracter do tipo char é lido na função *analyse*, este caracter pode ser o início de um identificador ou de uma palavra reservada, para fazer a verificação disso é necessário a criação de um buffer que ira armazenar todos os próximos caracteres lidos até que a palavra seja formada.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Após a palavra ser lida por completo verificamos se ela está ou não na lista de palavras reservadas, se estiver iremos achar qual das palavras da lista ela é e geramos um *token*, caso ela não esteja na lista verificamos se ela se encaixa como um identificador, se sim, um *token* é gerado, caso contrário nós temos um erro.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Após a palavra ser lida por completo verificamos se ela está ou não na tupla de palavras reservadas, se estiver iremos passar o valor da tupla para a função *createToken*, caso ela não esteja na lista verificamos se ela se encaixa como um identificador, se sim, um *token* é gerado, caso contrário nós temos um erro.
+
 #### &nbsp;&nbsp;&nbsp;Character Set:
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ao ler aspas duplas**"** , essa função adiciona os caracteres lidos em um buffer e só para quando encontrar outro caracter do mesmo tipo, ao encontra-lo o buffer é verificado, se seu conteúdo for igual ao da lista então ele serve para impressão de variáveis, logo, seu token será '**CHARACTER SET - VARIABLE**', caso o conteúdo não seja para impressão, o token gerado é '**CHARACTER SET - STRING**'.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ao ler aspas duplas**"** , essa função adiciona os caracteres lidos em um buffer e só para quando encontrar outro caracter do mesmo tipo, ao encontra-lo o buffer é verificado, se seu conteúdo for igual ao da tupla então ele serve para impressão de variáveis, logo, seu token será '**CHARACTER SET - VARIABLE**', caso o conteúdo não seja para impressão, o token gerado é '**CHARACTER SET - STRING**'.
 
 #### &nbsp;&nbsp;&nbsp;Number:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sabendo-se que números não são usados para iniciar palavras reservadas ou identificadores, quando um números são lidos resta apenas verificar se estes são do tipo inteiro ou flutuante.
@@ -27,12 +28,11 @@ ___
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A função *Number* se encarrega de realizar está verificação adicionando os números em um buffer, caso o numero não possua frações ele é classificado como **INTEGER**, caso possua então ele é classificado como **FLOAT**.
 
 #### &nbsp;&nbsp;&nbsp;Operator:
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Os operadores lógicos e aritméticos, por sua vez, possuem de 1 a 2 caracteres, e por serem muitos não é possível criar uma expressão regular para identifica-los, deste modo o melhor a se fazer é separar sua verificação em uma função especifica para facilitar o entendimento do código.
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;De modo simples, a função *Operator* verifica todos os operadores um por um, nem todos os operadores da linguagem C estão listados nesta função, mas apenas os mais usados.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Os operadores lógicos e aritméticos, por sua vez, possuem de 1 a 2 caracteres, e por serem muitos não é possível criar uma expressão regular para identifica-los, deste modo o melhor a se fazer é separa-los em uma pequena lista com apenas os operadores de 1 caracter para serem verificados na função principal, já dentro da função *operator* colocamos todos os possiveis operadores em tuplas, assim sua verificação pode ser feita de modo mais otimizado.
 
 #### &nbsp;&nbsp;&nbsp;Literals:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assim como os operadores os literais não podem ser classificados em expressões regulares, felizmente eles possuem apenas um caracter, logo se torna menos trabalhoso verificar um por um na função *Literals*.
+
 #### &nbsp;&nbsp;&nbsp;Create Token:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Esta simples função é a responsável pela criação de todos os tokens, ela recebe uma string como token e a escreve em um arquivo de saída.
 
@@ -56,3 +56,5 @@ ___
 * Ao escrever um código em C para teste é obrigatório soltar um espaço a direita dos números quando estes forem seguidos de um caracter que não seja ',' ou ';'.
 
 * O analisador possui limitações, ele reconhece apenas códigos simples da linguagem C.
+
+* O compilador ainda não esta completo, então o analisador léxico será atualizado posteriormente com a função createToken recebendo IDs reais ao invés de strings.

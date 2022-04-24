@@ -228,6 +228,6 @@ def tokenLiterals(charA):
     return tokenCreated
 
 def createToken(token):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
-    output = open('output2.txt','a')
+    output = open('output.txt','a')
     output.write(token + '\n')
     output.close()

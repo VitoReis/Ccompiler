@@ -1,6 +1,6 @@
 import re
 
-def analyse():
+def lexical():
     line = 1
     colon = 0
     errors = 0
@@ -34,19 +34,19 @@ def analyse():
             print(f'Finished with {errors} errors')
             break
         elif (re.match(identifierNumber, charA)):                                   #Verifica inteiros e flutuantes
-            tokenCreated, previousRead, colon = tokenNumber(charA, file, colon)
+            tokenCreated, previousRead, colon = tokenNumber(charA, file, colon, line)
             treatment = True
         elif (re.match(identifierWord, charA)):                                     #Verifica palavras reservadas e identificadores
-            tokenCreated, previousRead, colon = tokenReservedOrId(charA, file, colon)
+            tokenCreated, previousRead, colon = tokenReservedOrId(charA, file, colon, line)
             treatment = True
         elif charA == '"':                                                          #Verifica se é um conjunto de caracteres
-            tokenCreated, colon, jump = tokenCharacterSet(charA, file, colon)
+            tokenCreated, colon, jump = tokenCharacterSet(charA, file, colon, line)
         elif charA in logicOperatorsList or charA in arithmeticOperatorsList:       #Verifica se é um operador
-            tokenCreated, treatment, previousRead = tokenOperator(charA, file)
+            tokenCreated, treatment, previousRead = tokenOperator(charA, file, colon, line)
             if tokenCreated:
                 colon += 1
         elif charA in literalsList:                                                 #Verifica se é um literal
-            tokenCreated = tokenLiterals(charA)
+            tokenCreated = tokenLiterals(charA, colon, line)
         elif re.match(identifierSpaces, charA):                              #Verifica espaçamentos e quebras de linha
             if charA == '\n':
                 line += 1
@@ -58,7 +58,7 @@ def analyse():
         if tokenCreated == False:
             print(f"Lexical error in line: {line} colon: {colon}")          #Mostra a linha do erro
             print(f"Error starts in: {charA}")
-            createToken('------MISSING TOKEN------')                        #Imprime o erro no arquivo de saida
+            createToken('------MISSING TOKEN------',colon,line)                        #Imprime o erro no arquivo de saida
             if jump:
                 charA = file.readline()                                     #Pula a linha com erro
             else:
@@ -69,18 +69,18 @@ def analyse():
     file.close()
 
 
-def tokenReservedOrId(charA, file, colon):
-    reservedWordsTuple = {  ('main'):   'main' + '\t'*4 + 'RESERVED WORD',
-                            ('void'):   'void' + '\t'*4 + 'RESERVED WORD',
-                            ('int'):    'int' + '\t'*4 + 'RESERVED WORD',
-                            ('float'):  'float' + '\t'*4 + 'RESERVED WORD',
-                            ('char'):   'char' + '\t'*4 + 'RESERVED WORD',
-                            ('printf'): 'printf' + '\t'*4 + 'RESERVED WORD',
-                            ('for'):    'for' + '\t'*4 + 'RESERVED WORD',
-                            ('while'):  'while' + '\t'*4 + 'RESERVED WORD',
-                            ('true'):   'true' + '\t'*4 + 'RESERVED WORD',
-                            ('false'):  'false' + '\t'*4 + 'RESERVED WORD',
-                            ('break'):  'break' + '\t'*4 + 'RESERVED WORD'}
+def tokenReservedOrId(charA, file, colon, line):
+    reservedWordsTuple = {  ('main'):   'main RESERVED WORD',
+                            ('void'):   'void RESERVED WORD',
+                            ('int'):    'int RESERVED WORD',
+                            ('float'):  'float RESERVED WORD',
+                            ('char'):   'char RESERVED WORD',
+                            ('printf'): 'printf RESERVED WORD',
+                            ('for'):    'for RESERVED WORD',
+                            ('while'):  'while RESERVED WORD',
+                            ('true'):   'true RESERVED WORD',
+                            ('false'):  'false RESERVED WORD',
+                            ('break'):  'break RESERVED WORD'}
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''
@@ -91,15 +91,17 @@ def tokenReservedOrId(charA, file, colon):
         buff += charB
         charB = file.read(1)
 
+    tokenColon = colon
+
     colon = colon + len(buff)                                           #Calcula quantas colunas foram lidas
 
     if buff in reservedWordsTuple:                                      #Verifica se é uma palavra reservada
-        createToken(reservedWordsTuple.get(buff))
+        createToken(reservedWordsTuple.get(buff), tokenColon, line)
         tokenCreated = True
     else:                                                               #Verifica se é um identificador
         identifier = re.compile("^[a-zA-Z][a-zA-Z_0-9]*?$")
         if re.match(identifier, buff):
-            createToken(buff + '\t'*4 + 'IDENTIFIER')
+            createToken(buff + ' IDENTIFIER', tokenColon, line)
             tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -107,21 +109,22 @@ def tokenReservedOrId(charA, file, colon):
     return tokenCreated, charB, colon
 
 
-def tokenCharacterSet(charA, file, colon):                 #Encontra conjuntos de caracteres usando regex
+def tokenCharacterSet(charA, file, colon, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetTuple = {   ('"%i"'):   '"%i"' + '\t' * 2 + 'CHARACTER SET - VARIABLE',
-                            ('"%f"'):   '"%f"' + '\t' * 2 + 'CHARACTER SET - VARIABLE',
-                            ('"%c"'):   '"%c"' + '\t' * 2 + 'CHARACTER SET - VARIABLE'}
+    characterSetTuple = {   ('"%i"'):   '"%i" CHARACTER SET - VARIABLE',
+                            ('"%f"'):   '"%f" CHARACTER SET - VARIABLE',
+                            ('"%c"'):   '"%c" CHARACTER SET - VARIABLE'}
     buff = ''
     buff += charA
     charB = file.read(1)
     buff += charB
+    tokenColon = colon
     identifier = re.compile("^\".*?\"$")
     if charB == '"':                                        #Se charB for o fim da string ja termina
         colon += 1
         if re.match(identifier, buff):
-            createToken(buff + '\t'*2 + 'CHARACTER SET - STRING')
+            createToken(buff + ' CHARACTER SET - STRING', tokenColon, line)
             tokenCreated = True
     else:
         while charB != '"' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
@@ -135,10 +138,10 @@ def tokenCharacterSet(charA, file, colon):                 #Encontra conjuntos d
             jump = False
         elif re.match(identifier, buff):                      #Ao acabar verifica o tipo de conjunto
             if buff in characterSetTuple:
-                createToken(characterSetTuple.get(buff))
+                createToken(characterSetTuple.get(buff), tokenColon, line)
                 tokenCreated = True
             else:
-                createToken(buff + '\t'*2 + 'CHARACTER SET - STRING')
+                createToken(buff + ' CHARACTER SET - STRING', tokenColon, line)
                 tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -146,7 +149,7 @@ def tokenCharacterSet(charA, file, colon):                 #Encontra conjuntos d
     return tokenCreated, colon, jump
 
 
-def tokenNumber(charA, file, colon):
+def tokenNumber(charA, file, colon, line):
     charB = file.read(1)
     buff = ''
     buff += charA
@@ -159,7 +162,7 @@ def tokenNumber(charA, file, colon):
     while (re.match(identifier, charB)):                            #Verifica se o caracter é um numero ou .
         buff += charB
         charB = file.read(1)
-
+    tokenColon = colon
     colon = colon + len(buff)
 
     if not (re.match(identifierDetach, charB)):                     #Se nao terminar com separador retorna erro
@@ -167,78 +170,79 @@ def tokenNumber(charA, file, colon):
         return tokenCreated, ' ', colon
 
     if re.match(identifierInt, buff):                               #Verifica se é um inteiro
-        createToken(buff + '\t'*5 + 'INTEGER')
+        createToken(buff + ' INTEGER', tokenColon, line)
         tokenCreated = True
     elif re.match(identifierFloat, buff):                           #Verifica se é um float
-        createToken(buff + '\t'*5 + 'FLOAT')
+        createToken(buff + ' FLOAT', tokenColon, line)
         tokenCreated = True
 
     return tokenCreated, charB, colon
 
-def tokenOperator(charA, file):
+def tokenOperator(charA, file, colon, line):
+    tokenColon = colon
     tokenCreated = False
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsTuple = {('>'): '>' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('<'): '<' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('=='): '==' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('>='): '>=' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('<='): '<=' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('!='): '!=' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('!'): '!' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('&'): '&' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('&&'): '&&' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('|'): '|' + '\t' * 5 + 'LOGICAL OPERATOR',
-                          ('||'): '||' + '\t' * 5 + 'LOGICAL OPERATOR'}
+    logicOperatorsTuple = {('>'): '> LOGICAL OPERATOR',
+                          ('<'): '< LOGICAL OPERATOR',
+                          ('=='): '== LOGICAL OPERATOR',
+                          ('>='): '>= LOGICAL OPERATOR',
+                          ('<='): '<= LOGICAL OPERATOR',
+                          ('!='): '!= LOGICAL OPERATOR',
+                          ('!'): '! LOGICAL OPERATOR',
+                          ('&'): '& LOGICAL OPERATOR',
+                          ('&&'): '&& LOGICAL OPERATOR',
+                          ('|'): '| LOGICAL OPERATOR',
+                          ('||'): '|| LOGICAL OPERATOR'}
 
-    arithmeticOperatorsTuple = {('+'): '+' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('++'): '++' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('-'): '-' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('--'): '--' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('*'): '*' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('/'): '/' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('%'): '%' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('+='): '+=' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('-='): '-=' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('*='): '*=' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('/='): '/=' + '\t' * 5 + 'ARITHMETIC OPERATOR',
-                               ('='): '=' + '\t' * 5 + 'ARITHMETIC OPERATOR'}
+    arithmeticOperatorsTuple = {('+'): '+ ARITHMETIC OPERATOR',
+                               ('++'): '++ ARITHMETIC OPERATOR',
+                               ('-'): '- ARITHMETIC OPERATOR',
+                               ('--'): '-- ARITHMETIC OPERATOR',
+                               ('*'): '* ARITHMETIC OPERATOR',
+                               ('/'): '/ ARITHMETIC OPERATOR',
+                               ('%'): '% ARITHMETIC OPERATOR',
+                               ('+='): '+= ARITHMETIC OPERATOR',
+                               ('-='): '-= ARITHMETIC OPERATOR',
+                               ('*='): '*= ARITHMETIC OPERATOR',
+                               ('/='): '/= ARITHMETIC OPERATOR',
+                               ('='): '= ARITHMETIC OPERATOR'}
     if buff in logicOperatorsTuple:
-        createToken(logicOperatorsTuple.get(buff))
+        createToken(logicOperatorsTuple.get(buff), tokenColon, line)
         tokenCreated = True
     elif buff in arithmeticOperatorsTuple:
-        createToken(arithmeticOperatorsTuple.get(buff))
+        createToken(arithmeticOperatorsTuple.get(buff), tokenColon, line)
         tokenCreated = True
     elif charA in logicOperatorsTuple:
-        createToken(logicOperatorsTuple.get(charA))
+        createToken(logicOperatorsTuple.get(charA), tokenColon, line)
         tokenCreated = True
         treatment = True
     elif charA in arithmeticOperatorsTuple:
-        createToken(arithmeticOperatorsTuple.get(charA))
+        createToken(arithmeticOperatorsTuple.get(charA), tokenColon, line)
         tokenCreated = True
         treatment = True
 
     return tokenCreated, treatment, charB
 
-def tokenLiterals(charA):
-
-    literalsTuple = {   ('('): '(' + '\t' * 5 + 'LITERAL',
-                        (')'): ')' + '\t' * 5 + 'LITERAL',
-                        ('['): '[' + '\t' * 5 + 'LITERAL',
-                        (']'): ']' + '\t' * 5 + 'LITERAL',
-                        ('{'): '{' + '\t' * 5 + 'LITERAL',
-                        ('}'): '}' + '\t' * 5 + 'LITERAL',
-                        (','): ',' + '\t' * 5 + 'SEPARATOR',
-                        (';'): ';' + '\t' * 5 + 'SEPARATOR'}
+def tokenLiterals(charA, colon, line):
+    tokenColon = colon
+    literalsTuple = {   ('('): '( LITERAL',
+                        (')'): ') LITERAL',
+                        ('['): '[ LITERAL',
+                        (']'): '] LITERAL',
+                        ('{'): '{ LITERAL',
+                        ('}'): '} LITERAL',
+                        (','): ', SEPARATOR',
+                        (';'): '; SEPARATOR'}
 
     if charA in literalsTuple:
-        createToken(literalsTuple.get(charA))
+        createToken(literalsTuple.get(charA), tokenColon, line)
         tokenCreated = True
 
     return tokenCreated
 
-def createToken(token):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
+def createToken(token, tokenColon, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
     output = open('output.txt','a')
-    output.write(token + '\n')
+    output.write(f'TOKEN: {token} - COLON: {tokenColon} - LINE: {tokenLine}\n')
     output.close()

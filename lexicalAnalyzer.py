@@ -58,7 +58,7 @@ def lexical():
         if tokenCreated == False:
             print(f"Lexical error in line: {line} colon: {colon}")          #Mostra a linha do erro
             print(f"Error starts in: {charA}")
-            createToken('------MISSING TOKEN------',colon,line)                        #Imprime o erro no arquivo de saida
+            createToken('------MISSING TOKEN------','ERROR',colon,line)     #Imprime o erro no arquivo de saida
             if jump:
                 charA = file.readline()                                     #Pula a linha com erro
             else:
@@ -70,17 +70,17 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, colon, line):
-    reservedWordsTuple = {  ('main'):   'main RESERVED WORD',
-                            ('void'):   'void RESERVED WORD',
-                            ('int'):    'int RESERVED WORD',
-                            ('float'):  'float RESERVED WORD',
-                            ('char'):   'char RESERVED WORD',
-                            ('printf'): 'printf RESERVED WORD',
-                            ('for'):    'for RESERVED WORD',
-                            ('while'):  'while RESERVED WORD',
-                            ('true'):   'true RESERVED WORD',
-                            ('false'):  'false RESERVED WORD',
-                            ('break'):  'break RESERVED WORD'}
+    reservedWordsDict = {  ('main'):   ['main', 'RESERVED WORD'],
+                            ('void'):   ['void', 'RESERVED WORD'],
+                            ('int'):    ['int', 'RESERVED WORD'],
+                            ('float'):  ['float', 'RESERVED WORD'],
+                            ('char'):   ['char', 'RESERVED WORD'],
+                            ('printf'): ['printf', 'RESERVED WORD'],
+                            ('for'):    ['for', 'RESERVED WORD'],
+                            ('while'):  ['while', 'RESERVED WORD'],
+                            ('true'):   ['true', 'RESERVED WORD'],
+                            ('false'):  ['false', 'RESERVED WORD'],
+                            ('break'):  ['break', 'RESERVED WORD']}
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''
@@ -95,13 +95,13 @@ def tokenReservedOrId(charA, file, colon, line):
 
     colon = colon + len(buff)                                           #Calcula quantas colunas foram lidas
 
-    if buff in reservedWordsTuple:                                      #Verifica se é uma palavra reservada
-        createToken(reservedWordsTuple.get(buff), tokenColon, line)
+    if buff in reservedWordsDict:                                      #Verifica se é uma palavra reservada
+        createToken(reservedWordsDict.get(buff)[0],reservedWordsDict.get(buff)[1], tokenColon, line)
         tokenCreated = True
     else:                                                               #Verifica se é um identificador
         identifier = re.compile("^[a-zA-Z][a-zA-Z_0-9]*?$")
         if re.match(identifier, buff):
-            createToken(buff + ' IDENTIFIER', tokenColon, line)
+            createToken(buff, 'IDENTIFIER', tokenColon, line)
             tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -112,9 +112,9 @@ def tokenReservedOrId(charA, file, colon, line):
 def tokenCharacterSet(charA, file, colon, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetTuple = {   ('"%i"'):   '"%i" CHARACTER SET - VARIABLE',
-                            ('"%f"'):   '"%f" CHARACTER SET - VARIABLE',
-                            ('"%c"'):   '"%c" CHARACTER SET - VARIABLE'}
+    characterSetDict = {   ('"%i"'):   ['"%i"', 'CHARACTER SET - VARIABLE'],
+                            ('"%f"'):   ['"%f"', 'CHARACTER SET - VARIABLE'],
+                            ('"%c"'):   ['"%c"', 'CHARACTER SET - VARIABLE']}
     buff = ''
     buff += charA
     charB = file.read(1)
@@ -124,7 +124,7 @@ def tokenCharacterSet(charA, file, colon, line):                 #Encontra conju
     if charB == '"':                                        #Se charB for o fim da string ja termina
         colon += 1
         if re.match(identifier, buff):
-            createToken(buff + ' CHARACTER SET - STRING', tokenColon, line)
+            createToken(buff, 'CHARACTER SET - STRING', tokenColon, line)
             tokenCreated = True
     else:
         while charB != '"' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
@@ -137,11 +137,11 @@ def tokenCharacterSet(charA, file, colon, line):                 #Encontra conju
         if charB == '\n':
             jump = False
         elif re.match(identifier, buff):                      #Ao acabar verifica o tipo de conjunto
-            if buff in characterSetTuple:
-                createToken(characterSetTuple.get(buff), tokenColon, line)
+            if buff in characterSetDict:
+                createToken(characterSetDict.get(buff)[0], characterSetDict.get(buff)[1], tokenColon, line)
                 tokenCreated = True
             else:
-                createToken(buff + ' CHARACTER SET - STRING', tokenColon, line)
+                createToken(buff, 'CHARACTER SET - STRING', tokenColon, line)
                 tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -170,10 +170,10 @@ def tokenNumber(charA, file, colon, line):
         return tokenCreated, ' ', colon
 
     if re.match(identifierInt, buff):                               #Verifica se é um inteiro
-        createToken(buff + ' INTEGER', tokenColon, line)
+        createToken(buff, 'INTEGER', tokenColon, line)
         tokenCreated = True
     elif re.match(identifierFloat, buff):                           #Verifica se é um float
-        createToken(buff + ' FLOAT', tokenColon, line)
+        createToken(buff, 'FLOAT', tokenColon, line)
         tokenCreated = True
 
     return tokenCreated, charB, colon
@@ -184,42 +184,42 @@ def tokenOperator(charA, file, colon, line):
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsTuple = {('>'): '> LOGICAL OPERATOR',
-                          ('<'): '< LOGICAL OPERATOR',
-                          ('=='): '== LOGICAL OPERATOR',
-                          ('>='): '>= LOGICAL OPERATOR',
-                          ('<='): '<= LOGICAL OPERATOR',
-                          ('!='): '!= LOGICAL OPERATOR',
-                          ('!'): '! LOGICAL OPERATOR',
-                          ('&'): '& LOGICAL OPERATOR',
-                          ('&&'): '&& LOGICAL OPERATOR',
-                          ('|'): '| LOGICAL OPERATOR',
-                          ('||'): '|| LOGICAL OPERATOR'}
+    logicOperatorsDict = {('>'): ['>', 'LOGICAL OPERATOR'],
+                          ('<'): ['<', 'LOGICAL OPERATOR'],
+                          ('=='): ['==', 'LOGICAL OPERATOR'],
+                          ('>='): ['>=', 'LOGICAL OPERATOR'],
+                          ('<='): ['<=', 'LOGICAL OPERATOR'],
+                          ('!='): ['!=', 'LOGICAL OPERATOR'],
+                          ('!'): ['!', 'LOGICAL OPERATOR'],
+                          ('&'): ['&', 'LOGICAL OPERATOR'],
+                          ('&&'): ['&&', 'LOGICAL OPERATOR'],
+                          ('|'): ['|', 'LOGICAL OPERATOR'],
+                          ('||'): ['||', 'LOGICAL OPERATOR']}
 
-    arithmeticOperatorsTuple = {('+'): '+ ARITHMETIC OPERATOR',
-                               ('++'): '++ ARITHMETIC OPERATOR',
-                               ('-'): '- ARITHMETIC OPERATOR',
-                               ('--'): '-- ARITHMETIC OPERATOR',
-                               ('*'): '* ARITHMETIC OPERATOR',
-                               ('/'): '/ ARITHMETIC OPERATOR',
-                               ('%'): '% ARITHMETIC OPERATOR',
-                               ('+='): '+= ARITHMETIC OPERATOR',
-                               ('-='): '-= ARITHMETIC OPERATOR',
-                               ('*='): '*= ARITHMETIC OPERATOR',
-                               ('/='): '/= ARITHMETIC OPERATOR',
-                               ('='): '= ARITHMETIC OPERATOR'}
-    if buff in logicOperatorsTuple:
-        createToken(logicOperatorsTuple.get(buff), tokenColon, line)
+    arithmeticOperatorsDict = {('+'): ['+', 'ARITHMETIC OPERATOR'],
+                               ('++'): ['++', 'ARITHMETIC OPERATOR'],
+                               ('-'): ['-', 'ARITHMETIC OPERATOR'],
+                               ('--'): ['--', 'ARITHMETIC OPERATOR'],
+                               ('*'): ['*', 'ARITHMETIC OPERATOR'],
+                               ('/'): ['/', 'ARITHMETIC OPERATOR'],
+                               ('%'): ['%', 'ARITHMETIC OPERATOR'],
+                               ('+='): ['+=', 'ARITHMETIC OPERATOR'],
+                               ('-='): ['-=', 'ARITHMETIC OPERATOR'],
+                               ('*='): ['*=', 'ARITHMETIC OPERATOR'],
+                               ('/='): ['/=', 'ARITHMETIC OPERATOR'],
+                               ('='): ['=', 'ARITHMETIC OPERATOR']}
+    if buff in logicOperatorsDict:
+        createToken(logicOperatorsDict.get(buff)[0], logicOperatorsDict.get(buff)[1], tokenColon, line)
         tokenCreated = True
-    elif buff in arithmeticOperatorsTuple:
-        createToken(arithmeticOperatorsTuple.get(buff), tokenColon, line)
+    elif buff in arithmeticOperatorsDict:
+        createToken(arithmeticOperatorsDict.get(buff)[0], arithmeticOperatorsDict.get(buff)[1], tokenColon, line)
         tokenCreated = True
-    elif charA in logicOperatorsTuple:
-        createToken(logicOperatorsTuple.get(charA), tokenColon, line)
+    elif charA in logicOperatorsDict:
+        createToken(logicOperatorsDict.get(charA)[0], logicOperatorsDict.get(charA)[1], tokenColon, line)
         tokenCreated = True
         treatment = True
-    elif charA in arithmeticOperatorsTuple:
-        createToken(arithmeticOperatorsTuple.get(charA), tokenColon, line)
+    elif charA in arithmeticOperatorsDict:
+        createToken(arithmeticOperatorsDict.get(charA)[0], arithmeticOperatorsDict.get(charA)[1], tokenColon, line)
         tokenCreated = True
         treatment = True
 
@@ -227,22 +227,25 @@ def tokenOperator(charA, file, colon, line):
 
 def tokenLiterals(charA, colon, line):
     tokenColon = colon
-    literalsTuple = {   ('('): '( LITERAL',
-                        (')'): ') LITERAL',
-                        ('['): '[ LITERAL',
-                        (']'): '] LITERAL',
-                        ('{'): '{ LITERAL',
-                        ('}'): '} LITERAL',
-                        (','): ', SEPARATOR',
-                        (';'): '; SEPARATOR'}
+    literalsDict = {   ('('): ['(', 'LITERAL'],
+                        (')'): [')', 'LITERAL'],
+                        ('['): ['[', 'LITERAL'],
+                        (']'): [']', 'LITERAL'],
+                        ('{'): ['{', 'LITERAL'],
+                        ('}'): ['}', 'LITERAL'],
+                        (','): [',', 'SEPARATOR'],
+                        (';'): [';', 'SEPARATOR']}
 
-    if charA in literalsTuple:
-        createToken(literalsTuple.get(charA), tokenColon, line)
+    if charA in literalsDict:
+        createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColon, line)
         tokenCreated = True
 
     return tokenCreated
 
-def createToken(token, tokenColon, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
-    output = open('output.txt','a')
-    output.write(f'TOKEN: {token} - COLON: {tokenColon} - LINE: {tokenLine}\n')
+def createToken(token, tokenType, tokenColon, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
+    output = open('lexOutput.txt','a')
+    userOutput = open('lexUserOutput.txt','a')
+    output.write(f'{token}~{tokenType}~{tokenColon}~{tokenLine}\n')
+    userOutput.write(f'TOKEN: {token} - TYPE: {tokenType} - COLON: {tokenColon} - LINE: {tokenLine}\n')
     output.close()
+    userOutput.close()

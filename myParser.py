@@ -26,7 +26,7 @@ def reservedWord(token, file):
         elif token[1] == 'SEP':
             separator(token, file)
         else:
-            print('Error RW')
+            print(f'Error RW {token[2]} {token[3]}')
 
 def identifier(token, file):
     print('ID')
@@ -45,7 +45,7 @@ def identifier(token, file):
     elif token[1] == 'LO':
         logicalOperator(token, file)
     else:
-        print('Error ID')
+        print(f'Error ID {token[2]} {token[3]}')
 
 def ArithmeticOperator(token, file):
     print('AO')
@@ -61,7 +61,7 @@ def ArithmeticOperator(token, file):
     elif token[1] == 'LIT':
         literals(token, file)
     else:
-        print('Error AO')
+        print(f'Error AO {token[2]} {token[3]}')
 
 def literals(token, file):
     print('Lit')
@@ -95,7 +95,7 @@ def integer(token, file):
     elif token[1] == 'AO':
         ArithmeticOperator(token, file)
     else:
-        print('Erro int')
+        print(f'Erro int {token[2]} {token[3]}')
 
 def floater(token, file):
     print('Float')
@@ -105,7 +105,7 @@ def floater(token, file):
     elif token[1] == 'AO':
         ArithmeticOperator(token, file)
     else:
-        print('Erro float')
+        print(f'Erro float {token[2]} {token[3]}')
 
 def charSetV(token, file):
     print('CSV')
@@ -115,7 +115,7 @@ def charSetV(token, file):
     elif token[1] == 'LIT':
         literals(token, file)
     else:
-        print('Erro CSV')
+        print(f'Erro CSV {token[2]} {token[3]}')
 
 def charSetS(token, file):
     print('CSS')
@@ -125,7 +125,7 @@ def charSetS(token, file):
     elif token[1] == 'LIT':
         literals(token, file)
     else:
-        print('Erro CSS')
+        print(f'Erro CSS {token[2]} {token[3]}')
 
 def logicalOperator(token, file):
     print('LO')
@@ -137,4 +137,4 @@ def logicalOperator(token, file):
     elif token[1] == 'FLOAT':
         floater(token, file)
     else:
-        print('Erro LO')
+        print(f'Erro LO {token[2]} {token[3]}')

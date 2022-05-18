@@ -70,17 +70,16 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, colon, line):
-    reservedWordsDict = {  ('main'):   ['main', 'RESERVED WORD'],
-                            ('void'):   ['void', 'RESERVED WORD'],
-                            ('int'):    ['int', 'RESERVED WORD'],
-                            ('float'):  ['float', 'RESERVED WORD'],
-                            ('char'):   ['char', 'RESERVED WORD'],
-                            ('printf'): ['printf', 'RESERVED WORD'],
-                            ('for'):    ['for', 'RESERVED WORD'],
-                            ('while'):  ['while', 'RESERVED WORD'],
-                            ('true'):   ['true', 'RESERVED WORD'],
-                            ('false'):  ['false', 'RESERVED WORD'],
-                            ('break'):  ['break', 'RESERVED WORD']}
+    reservedWordsDict = {   ('void'):   ['void', 'RW'],
+                            ('int'):    ['int', 'RW'],
+                            ('float'):  ['float', 'RW'],
+                            ('char'):   ['char', 'RW'],
+                            ('printf'): ['printf', 'RW'],
+                            ('for'):    ['for', 'RW'],
+                            ('while'):  ['while', 'RW'],
+                            ('true'):   ['true', 'RW'],
+                            ('false'):  ['false', 'RW'],
+                            ('break'):  ['break', 'RW']}
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''
@@ -101,7 +100,7 @@ def tokenReservedOrId(charA, file, colon, line):
     else:                                                               #Verifica se é um identificador
         identifier = re.compile("^[a-zA-Z][a-zA-Z_0-9]*?$")
         if re.match(identifier, buff):
-            createToken(buff, 'IDENTIFIER', tokenColon, line)
+            createToken(buff, 'ID', tokenColon, line)
             tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -112,9 +111,9 @@ def tokenReservedOrId(charA, file, colon, line):
 def tokenCharacterSet(charA, file, colon, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetDict = {   ('"%i"'):   ['"%i"', 'CHARACTER SET - VARIABLE'],
-                            ('"%f"'):   ['"%f"', 'CHARACTER SET - VARIABLE'],
-                            ('"%c"'):   ['"%c"', 'CHARACTER SET - VARIABLE']}
+    characterSetDict = {   ('"%i"'):   ['"%i"', 'CS - V'],
+                            ('"%f"'):   ['"%f"', 'CS - V'],
+                            ('"%c"'):   ['"%c"', 'CS - V']}
     buff = ''
     buff += charA
     charB = file.read(1)
@@ -124,7 +123,7 @@ def tokenCharacterSet(charA, file, colon, line):                 #Encontra conju
     if charB == '"':                                        #Se charB for o fim da string ja termina
         colon += 1
         if re.match(identifier, buff):
-            createToken(buff, 'CHARACTER SET - STRING', tokenColon, line)
+            createToken(buff, 'CS - S', tokenColon, line)
             tokenCreated = True
     else:
         while charB != '"' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
@@ -141,7 +140,7 @@ def tokenCharacterSet(charA, file, colon, line):                 #Encontra conju
                 createToken(characterSetDict.get(buff)[0], characterSetDict.get(buff)[1], tokenColon, line)
                 tokenCreated = True
             else:
-                createToken(buff, 'CHARACTER SET - STRING', tokenColon, line)
+                createToken(buff, 'CS - S', tokenColon, line)
                 tokenCreated = True
         else:
             colon = colon - len(buff)
@@ -170,7 +169,7 @@ def tokenNumber(charA, file, colon, line):
         return tokenCreated, ' ', colon
 
     if re.match(identifierInt, buff):                               #Verifica se é um inteiro
-        createToken(buff, 'INTEGER', tokenColon, line)
+        createToken(buff, 'INT', tokenColon, line)
         tokenCreated = True
     elif re.match(identifierFloat, buff):                           #Verifica se é um float
         createToken(buff, 'FLOAT', tokenColon, line)
@@ -184,30 +183,30 @@ def tokenOperator(charA, file, colon, line):
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsDict = {('>'): ['>', 'LOGICAL OPERATOR'],
-                          ('<'): ['<', 'LOGICAL OPERATOR'],
-                          ('=='): ['==', 'LOGICAL OPERATOR'],
-                          ('>='): ['>=', 'LOGICAL OPERATOR'],
-                          ('<='): ['<=', 'LOGICAL OPERATOR'],
-                          ('!='): ['!=', 'LOGICAL OPERATOR'],
-                          ('!'): ['!', 'LOGICAL OPERATOR'],
-                          ('&'): ['&', 'LOGICAL OPERATOR'],
-                          ('&&'): ['&&', 'LOGICAL OPERATOR'],
-                          ('|'): ['|', 'LOGICAL OPERATOR'],
-                          ('||'): ['||', 'LOGICAL OPERATOR']}
+    logicOperatorsDict = {('>'): ['>', 'LO'],
+                          ('<'): ['<', 'LO'],
+                          ('=='): ['==', 'LO'],
+                          ('>='): ['>=', 'LO'],
+                          ('<='): ['<=', 'LO'],
+                          ('!='): ['!=', 'LO'],
+                          ('!'): ['!', 'LO'],
+                          ('&'): ['&', 'LO'],
+                          ('&&'): ['&&', 'LO'],
+                          ('|'): ['|', 'LO'],
+                          ('||'): ['||', 'LO']}
 
-    arithmeticOperatorsDict = {('+'): ['+', 'ARITHMETIC OPERATOR'],
-                               ('++'): ['++', 'ARITHMETIC OPERATOR'],
-                               ('-'): ['-', 'ARITHMETIC OPERATOR'],
-                               ('--'): ['--', 'ARITHMETIC OPERATOR'],
-                               ('*'): ['*', 'ARITHMETIC OPERATOR'],
-                               ('/'): ['/', 'ARITHMETIC OPERATOR'],
-                               ('%'): ['%', 'ARITHMETIC OPERATOR'],
-                               ('+='): ['+=', 'ARITHMETIC OPERATOR'],
-                               ('-='): ['-=', 'ARITHMETIC OPERATOR'],
-                               ('*='): ['*=', 'ARITHMETIC OPERATOR'],
-                               ('/='): ['/=', 'ARITHMETIC OPERATOR'],
-                               ('='): ['=', 'ARITHMETIC OPERATOR']}
+    arithmeticOperatorsDict = {('+'): ['+', 'AO'],
+                               ('++'): ['++', 'AO'],
+                               ('-'): ['-', 'AO'],
+                               ('--'): ['--', 'AO'],
+                               ('*'): ['*', 'AO'],
+                               ('/'): ['/', 'AO'],
+                               ('%'): ['%', 'AO'],
+                               ('+='): ['+=', 'AO'],
+                               ('-='): ['-=', 'AO'],
+                               ('*='): ['*=', 'AO'],
+                               ('/='): ['/=', 'AO'],
+                               ('='): ['=', 'AO']}
     if buff in logicOperatorsDict:
         createToken(logicOperatorsDict.get(buff)[0], logicOperatorsDict.get(buff)[1], tokenColon, line)
         tokenCreated = True
@@ -227,14 +226,14 @@ def tokenOperator(charA, file, colon, line):
 
 def tokenLiterals(charA, colon, line):
     tokenColon = colon
-    literalsDict = {   ('('): ['(', 'LITERAL'],
-                        (')'): [')', 'LITERAL'],
-                        ('['): ['[', 'LITERAL'],
-                        (']'): [']', 'LITERAL'],
-                        ('{'): ['{', 'LITERAL'],
-                        ('}'): ['}', 'LITERAL'],
-                        (','): [',', 'SEPARATOR'],
-                        (';'): [';', 'SEPARATOR']}
+    literalsDict = {   ('('): ['(', 'LIT'],
+                        (')'): [')', 'LIT'],
+                        ('['): ['[', 'LIT'],
+                        (']'): [']', 'LIT'],
+                        ('{'): ['{', 'LIT'],
+                        ('}'): ['}', 'LIT'],
+                        (','): [',', 'SEP'],
+                        (';'): [';', 'SEP']}
 
     if charA in literalsDict:
         createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColon, line)

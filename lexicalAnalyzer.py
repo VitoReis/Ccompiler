@@ -226,14 +226,14 @@ def tokenOperator(charA, file, column, line):
 
 def tokenLiterals(charA, column, line):
     tokenColumn = column
-    literalsDict = {   ('('): ['(', 'LIT'],
-                        (')'): [')', 'LIT'],
-                        ('['): ['[', 'LIT'],
-                        (']'): [']', 'LIT'],
-                        ('{'): ['{', 'LIT'],
-                        ('}'): ['}', 'LIT'],
-                        (','): [',', 'SEP'],
-                        (';'): [';', 'SEP']}
+    literalsDict = {   ('('): ['(', 'OP'],
+                        (')'): [')', 'CP'],
+                        ('['): ['[', 'OB'],
+                        (']'): [']', 'CB'],
+                        ('{'): ['{', 'OCB'],
+                        ('}'): ['}', 'CCB'],
+                        (','): [',', 'COMMA'],
+                        (';'): [';', 'SEMICOLON']}
 
     if charA in literalsDict:
         createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColumn, line)

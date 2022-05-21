@@ -1,10 +1,15 @@
 #Apenas testando
+
+contP = 0
+contB = 0
+contCB = 0
+
 def myParser():
     file = open('lexOutput.txt','r')
     while True:
         token = file.readline()
         if not token:
-            quit()
+            break
         token = token.split('~')
         if token[1] == 'RW':
             reservedWord(token, file)
@@ -12,6 +17,8 @@ def myParser():
             identifier(token, file)
         elif token[1] == 'LIT':
             literals(token, file)
+    if contP > 0 or contP < 0:          #Se algum bloco não for fechado ou aberto retorna erro
+        print('ERROR')
 
 def reservedWord(token, file):
         print('RW')
@@ -138,3 +145,35 @@ def logicalOperator(token, file):
         floater(token, file)
     else:
         print(f'Erro LO {token[2]} {token[3]}')
+
+        if token[1] == 'OP' or token[1] == 'OB' or token[1] == 'OCB':
+            OP(token, file)
+        elif token[1] == 'CP' or token[1] == 'CB' or token[1] == 'CCB':
+            CP(token, file)
+
+
+
+def OP(token, file):
+    print('OP')
+    global contP
+    global contB
+    global contCB
+    if token[1] == 'OP':
+        contP += 1
+    elif token[1] == 'OB':
+        contB += 1
+    elif token[1] == 'OCB':
+        contCB += 1
+
+
+def CP(token, file):
+    print('CP')
+    global contP
+    global contB
+    global contCB
+    if token[1] == 'CP':
+        contP -= 1
+    elif token[1] == 'CB':
+        contB -= 1
+    elif token[1] == 'CCB':
+        contCB -= 1

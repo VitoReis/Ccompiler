@@ -10,8 +10,8 @@ def lexical():
     identifierWord = ("[a-zA-Z]")
     identifierSpaces = ("[\s\\n\\t]")
     previousRead = ''
-    logicOperatorsList = ['>', '<', '!', '&', '|']
-    arithmeticOperatorsList = ['+', '-', '*', '/', '%', '=']
+    logicOperatorsList = ['>', '<']                             # REMOVED: '!', '&', '|'
+    arithmeticOperatorsList = ['+', '-', '*', '/', '=']         # '%',
     literalsList = ['(', ')', '[', ']', '{', '}', ',', ';']
 
     file = open('code.c', 'r')
@@ -70,16 +70,16 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {   ('void'):   ['void', 'RW'],
-                            ('int'):    ['int', 'RW'],
-                            ('float'):  ['float', 'RW'],
-                            ('char'):   ['char', 'RW'],
-                            ('printf'): ['printf', 'RW'],
-                            ('for'):    ['for', 'RW'],
-                            ('while'):  ['while', 'RW'],
-                            ('true'):   ['true', 'RW'],
-                            ('false'):  ['false', 'RW'],
-                            ('break'):  ['break', 'RW']}
+    reservedWordsDict = {   ('void'):   ['void', 'VOID'],
+                            ('int'):    ['int', 'INT'],
+                            ('float'):  ['float', 'FLOAT'],
+                            ('char'):   ['char', 'CHAR'],
+                            ('printf'): ['printf', 'PRINT'],
+                            ('for'):    ['for', 'FOR'],
+                            ('while'):  ['while', 'WHILE'],
+                            ('true'):   ['true', 'TRUE'],
+                            ('false'):  ['false', 'FALSE'],
+                            ('break'):  ['break', 'BREAK']}
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''
@@ -183,30 +183,23 @@ def tokenOperator(charA, file, column, line):
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsDict = {('>'): ['>', 'LO'],
-                          ('<'): ['<', 'LO'],
-                          ('=='): ['==', 'LO'],
-                          ('>='): ['>=', 'LO'],
-                          ('<='): ['<=', 'LO'],
-                          ('!='): ['!=', 'LO'],
-                          ('!'): ['!', 'LO'],
-                          ('&'): ['&', 'LO'],
-                          ('&&'): ['&&', 'LO'],
-                          ('|'): ['|', 'LO'],
-                          ('||'): ['||', 'LO']}
+    logicOperatorsDict = {('>'): ['>', 'GT'],           # REMOVED ('!'): ['!', 'LO'], ('&'): ['&', 'LO'], ('&&'): ['&&', 'LO'], ('|'): ['|', 'LO']
+                          ('<'): ['<', 'LT'],
+                          ('=='): ['==', 'EE'],
+                          ('>='): ['>=', 'GE'],
+                          ('<='): ['<=', 'LE'],
+                          ('!='): ['!=', 'DIF'],
 
-    arithmeticOperatorsDict = {('+'): ['+', 'AO'],
-                               ('++'): ['++', 'AO'],
-                               ('-'): ['-', 'AO'],
-                               ('--'): ['--', 'AO'],
-                               ('*'): ['*', 'AO'],
-                               ('/'): ['/', 'AO'],
-                               ('%'): ['%', 'AO'],
-                               ('+='): ['+=', 'AO'],
-                               ('-='): ['-=', 'AO'],
-                               ('*='): ['*=', 'AO'],
-                               ('/='): ['/=', 'AO'],
-                               ('='): ['=', 'AO']}
+                          ('||'): ['||', 'OR']}
+
+    arithmeticOperatorsDict = {('+'): ['+', 'ADD'],         # REMOVED # ('%'): ['%', 'AO'], ('+='): ['+=', 'AO'], ('-='): ['-=', 'AO'], ('*='): ['*=', 'AO'], ('/='): ['/=', 'AO']
+                               ('++'): ['++', 'ADDO'],
+                               ('-'): ['-', 'SUB'],
+                               ('--'): ['--', 'SUBO'],
+                               ('*'): ['*', 'MULT'],
+                               ('/'): ['/', 'DIV'],
+                               ('='): ['=', 'EQUAL']}
+
     if buff in logicOperatorsDict:
         createToken(logicOperatorsDict.get(buff)[0], logicOperatorsDict.get(buff)[1], tokenColumn, line)
         tokenCreated = True

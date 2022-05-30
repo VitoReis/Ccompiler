@@ -1,5 +1,5 @@
 from lexicalAnalyzer import *
-from myParser import *
+# from myParser import *
 
 lexical()
-myParser()
+# myParser()

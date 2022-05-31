@@ -5,16 +5,14 @@ void main(){
     a = 2;
     float c;
     b = 6;
+    b = a;
     float ab = 2;
     ab = ab * 69.8;
     c = a + b;
-    c --;
-    c++;
-    c = c / 2;
+    c = c - 1;
+    c = c + 1;
+    c = c / 5;
     printf ("%f", c );
-    for(int i=0; i < 10; i++){
-        c = c * i;
-    }
     while(true){
         printf("Hello Friend");
 	    break;

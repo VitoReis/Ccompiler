@@ -70,12 +70,11 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {   ('void'):   ['void', 'VOID'],
+    reservedWordsDict = {   ('void'):   ['void', 'VOID'],       # 'for':    ['for', 'FOR'],
                             ('int'):    ['int', 'INT'],
                             ('float'):  ['float', 'FLOAT'],
                             ('char'):   ['char', 'CHAR'],
                             ('printf'): ['printf', 'PRINT'],
-                            ('for'):    ['for', 'FOR'],
                             ('while'):  ['while', 'WHILE'],
                             ('true'):   ['true', 'TRUE'],
                             ('false'):  ['false', 'FALSE'],
@@ -111,9 +110,9 @@ def tokenReservedOrId(charA, file, column, line):
 def tokenCharacterSet(charA, file, column, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetDict = {   ('"%i"'):   ['"%i"', 'CS - V'],
-                            ('"%f"'):   ['"%f"', 'CS - V'],
-                            ('"%c"'):   ['"%c"', 'CS - V']}
+    characterSetDict = {   ('"%i"'):   ['"%i"', 'CS - V - INT'],
+                            ('"%f"'):   ['"%f"', 'CS - V - FLOAT'],
+                            ('"%c"'):   ['"%c"', 'CS - V - CHAR']}
     buff = ''
     buff += charA
     charB = file.read(1)
@@ -169,10 +168,10 @@ def tokenNumber(charA, file, column, line):
         return tokenCreated, ' ', column
 
     if re.match(identifierInt, buff):                               #Verifica se é um inteiro
-        createToken(buff, 'INT', tokenColumn, line)
+        createToken(buff, 'NUM - INT', tokenColumn, line)
         tokenCreated = True
     elif re.match(identifierFloat, buff):                           #Verifica se é um float
-        createToken(buff, 'FLOAT', tokenColumn, line)
+        createToken(buff, 'NUM - FLOAT', tokenColumn, line)
         tokenCreated = True
 
     return tokenCreated, charB, column
@@ -183,22 +182,19 @@ def tokenOperator(charA, file, column, line):
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsDict = {('>'): ['>', 'GT'],           # REMOVED ('!'): ['!', 'LO'], ('&'): ['&', 'LO'], ('&&'): ['&&', 'LO'], ('|'): ['|', 'LO']
-                          ('<'): ['<', 'LT'],
-                          ('=='): ['==', 'EE'],
-                          ('>='): ['>=', 'GE'],
-                          ('<='): ['<=', 'LE'],
-                          ('!='): ['!=', 'DIF'],
+    logicOperatorsDict = {'>': ['>', 'GT'],           # REMOVED ('!'): ['!', 'LO'], ('&'): ['&', 'LO'], ('&&'): ['&&', 'LO'], ('|'): ['|', 'LO']
+                          '<': ['<', 'LT'],
+                          '==': ['==', 'EE'],
+                          '>=': ['>=', 'GE'],
+                          '<=': ['<=', 'LE'],
+                          '!=': ['!=', 'DIF'],
+                          '||': ['||', 'OR']}
 
-                          ('||'): ['||', 'OR']}
-
-    arithmeticOperatorsDict = {('+'): ['+', 'ADD'],         # REMOVED # ('%'): ['%', 'AO'], ('+='): ['+=', 'AO'], ('-='): ['-=', 'AO'], ('*='): ['*=', 'AO'], ('/='): ['/=', 'AO']
-                               ('++'): ['++', 'ADDO'],
-                               ('-'): ['-', 'SUB'],
-                               ('--'): ['--', 'SUBO'],
-                               ('*'): ['*', 'MULT'],
-                               ('/'): ['/', 'DIV'],
-                               ('='): ['=', 'EQUAL']}
+    arithmeticOperatorsDict = {'+': ['+', 'ADD'],         # REMOVED # ('%'): ['%', 'AO'], ('+='): ['+=', 'AO'], ('-='): ['-=', 'AO'], ('*='): ['*=', 'AO'], ('/='): ['/=', 'AO'], ('++'): ['++', 'ADDO'],('--'): ['--', 'SUBO'],
+                               '-': ['-', 'SUB'],
+                               '*': ['*', 'MULT'],
+                               '/': ['/', 'DIV'],
+                               '=': ['=', 'EQUAL']}
 
     if buff in logicOperatorsDict:
         createToken(logicOperatorsDict.get(buff)[0], logicOperatorsDict.get(buff)[1], tokenColumn, line)
@@ -234,10 +230,10 @@ def tokenLiterals(charA, column, line):
 
     return tokenCreated
 
-def createToken(token, tokenType, tokenColumn, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
+def createToken(content, token, tokenColumn, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
     output = open('lexOutput.txt','a')
     userOutput = open('lexUserOutput.txt','a')
-    output.write(f'{token}~{tokenType}~{tokenColumn}~{tokenLine}\n')
-    userOutput.write(f'TOKEN: {token} - TYPE: {tokenType} - Column: {tokenColumn} - LINE: {tokenLine}\n')
+    output.write(f'{content}~{token}~{tokenColumn}~{tokenLine}\n')
+    userOutput.write(f'CONTENT: {content} - TOKEN: {token} - COLUMN: {tokenColumn} - LINE: {tokenLine}\n')
     output.close()
     userOutput.close()

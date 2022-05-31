@@ -12,10 +12,12 @@ def myParser():
         token = file[s].split('~')
         verify(token, file, s+1)
         s += 1
+    if len(cbList) > 0:
+        print(cbList[len(cbList)])
 
 
 def verify(token, file, s):
-    global lastImportant, subImportant, operators, arithmetichOperators, cbList
+    global lastImportant, subImportant, logicalOperators, arithmetichOperators, cbList
     if token[1] == 'VOID':
         nexToken = file[s].split('~')
         if nexToken[1] == 'ID':
@@ -58,8 +60,8 @@ def verify(token, file, s):
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
         elif lastImportant == 'WHILE':
-            if nexToken[1] in logicalOperators or nexToken[1] == 'EQUAL':
-                lastImportant == token[1]
+            if nexToken[1] in logicalOperators or nexToken[1] == 'CP':       # or nexToken[1] == 'CP'
+                lastImportant = token[1]
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
@@ -74,6 +76,7 @@ def verify(token, file, s):
         nexToken = file[s].split('~')
         if lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
             if nexToken[1] == 'OP':
+                lastImportant = token[1]
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
@@ -108,7 +111,7 @@ def verify(token, file, s):
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
         elif lastImportant == 'WHILE' or lastImportant == 'ID':
-            if nexToken[1] in arithmetichOperators or nexToken[1] == 'CP':
+            if nexToken[1] == 'CP' or nexToken[1] in arithmetichOperators:
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
@@ -138,7 +141,7 @@ def verify(token, file, s):
 
     elif token[1] == 'CP':
         nexToken = file[s].split('~')
-        if lastImportant == 'VOID' or lastImportant == 'WHILE':
+        if lastImportant == 'VOID' or lastImportant == 'WHILE' or lastImportant == 'ID':
             if nexToken[1] == 'OCB':
                 print('OK')
             else:
@@ -163,11 +166,11 @@ def verify(token, file, s):
 
     elif token[1] == 'CCB':
         lastImportant = token[1]
-        if len(cbList):
+        if len(cbList) >= 1:
             cbList.pop()
+            print('OK')
         else:
-            print(cbList[len(cbList)-1])
-        print('OK')
+            print(f'ERROR: Column {token[2]} - Line {token[3]}')
 
 
     elif token[1] == 'PRINT':

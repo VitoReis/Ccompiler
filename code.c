@@ -12,7 +12,7 @@ void main(){
     c = c - 1;
     c = c + 1;
     c = c / 5;
-    printf ("%f", c );
+    printf ("%f", c);
     while(true){
         printf("Hello Friend");
 	    break;

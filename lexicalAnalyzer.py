@@ -70,15 +70,15 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {   ('void'):   ['void', 'VOID'],       # 'for':    ['for', 'FOR'],
-                            ('int'):    ['int', 'INT'],
-                            ('float'):  ['float', 'FLOAT'],
-                            ('char'):   ['char', 'CHAR'],
-                            ('printf'): ['printf', 'PRINT'],
-                            ('while'):  ['while', 'WHILE'],
-                            ('true'):   ['true', 'TRUE'],
-                            ('false'):  ['false', 'FALSE'],
-                            ('break'):  ['break', 'BREAK']}
+    reservedWordsDict = {'void':  ['void', 'VOID'],       # 'for':    ['for', 'FOR'],
+                        'int':    ['int', 'INT'],
+                        'float':  ['float', 'FLOAT'],
+                        'char':   ['char', 'CHAR'],
+                        'printf': ['printf', 'PRINT'],
+                        'while':  ['while', 'WHILE'],
+                        'true':   ['true', 'TRUE'],
+                        'false':  ['false', 'FALSE'],
+                        'break':  ['break', 'BREAK']}
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''
@@ -110,9 +110,9 @@ def tokenReservedOrId(charA, file, column, line):
 def tokenCharacterSet(charA, file, column, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetDict = {   ('"%i"'):   ['"%i"', 'CS - V - INT'],
-                            ('"%f"'):   ['"%f"', 'CS - V - FLOAT'],
-                            ('"%c"'):   ['"%c"', 'CS - V - CHAR']}
+    characterSetDict = {'"%i"':   ['"%i"', 'CS - V - INT'],
+                        '"%f"':   ['"%f"', 'CS - V - FLOAT'],
+                        '"%c"':   ['"%c"', 'CS - V - CHAR']}
     buff = ''
     buff += charA
     charB = file.read(1)
@@ -153,7 +153,7 @@ def tokenNumber(charA, file, column, line):
     buff += charA
     tokenCreated = False
     identifier = re.compile("[0-9\.]")
-    identifierDetach = re.compile("[\s\\n\\t;,]")
+    identifierDetach = re.compile("[\s\n\t;,)\]+\-*/><=!|]")
     identifierInt = re.compile("^[0-9][0-9]*?$")
     identifierFloat = re.compile("^[0-9][0-9]*?\.[0-9]*?[0-9]$")
 
@@ -215,14 +215,14 @@ def tokenOperator(charA, file, column, line):
 
 def tokenLiterals(charA, column, line):
     tokenColumn = column
-    literalsDict = {   ('('): ['(', 'OP'],
-                        (')'): [')', 'CP'],
-                        ('['): ['[', 'OB'],
-                        (']'): [']', 'CB'],
-                        ('{'): ['{', 'OCB'],
-                        ('}'): ['}', 'CCB'],
-                        (','): [',', 'COMMA'],
-                        (';'): [';', 'SEMICOLON']}
+    literalsDict = {    '(': ['(', 'OP'],
+                        ')': [')', 'CP'],
+                        '[': ['[', 'OB'],
+                        ']': [']', 'CB'],
+                        '{': ['{', 'OCB'],
+                        '}': ['}', 'CCB'],
+                        ',': [',', 'COMMA'],
+                        ';': [';', 'SEMICOLON']}
 
     if charA in literalsDict:
         createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColumn, line)

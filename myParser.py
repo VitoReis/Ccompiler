@@ -8,12 +8,17 @@ cbList = []
 def myParser():
     file = open('lexOutput.txt','r').readlines()
     s = 0
+    error = False
     while s < len(file):
         token = file[s].split('~')
-        verify(token, file, s+1)
+        error = verify(token, file, s+1)
         s += 1
     if len(cbList) > 0:
         print(cbList[len(cbList)])
+    elif error:
+        while token[1] != 'SEMICOLON' or token[1] != 'OCB':
+            s += 1
+            token = file[s].split('~')
 
 
 def verify(token, file, s):
@@ -25,6 +30,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'ID':
@@ -34,42 +40,50 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'VOID':
             if nexToken[1] == 'OP':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'INT' or lastImportant == 'FLOAT':
             if nexToken[1] == 'COMMA' or nexToken[1] == 'SEMICOLON' or nexToken[1] == 'EQUAL':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
             if nexToken[1] == 'EQUAL' or nexToken[1] == 'SEMICOLON':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'EQUAL':
             if nexToken[1] in arithmetichOperators or nexToken[1] == 'SEMICOLON':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'PRINT':
             if nexToken[1] == 'CP':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'WHILE':
             if nexToken[1] in logicalOperators or nexToken[1] == 'CP':       # or nexToken[1] == 'CP'
                 lastImportant = token[1]
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'ID':
             if nexToken[1] == 'OP' or nexToken[1] in arithmetichOperators:
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'WHILE':
@@ -80,6 +94,7 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'INT' or token[1] == 'FLOAT':
@@ -90,17 +105,20 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'OCB' or lastImportant == 'SEMICOLON':                 # VERIFICAR POSTERIORMENTE
             if nexToken[1] == 'ID':
                 lastImportant = token[1]
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'ID':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'NUM - INT' or token[1] == 'NUM - FLOAT':
@@ -110,11 +128,13 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'WHILE' or lastImportant == 'ID':
             if nexToken[1] == 'CP' or nexToken[1] in arithmetichOperators:
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'OP':
@@ -124,12 +144,14 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'PRINT':
             if nexToken[1] == 'CS - V - INT' or nexToken[1] == 'CS - V - FLOAT' or nexToken[1] == 'CS - V - CHAR' \
                                                                                 or nexToken[1] == 'CS - S':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'ID' or nexToken[1] == 'INT' or nexToken[1] == 'FLOAT' \
                                                             or nexToken[1] == 'TRUE' \
@@ -137,6 +159,7 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'CP':
@@ -146,11 +169,13 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
         elif lastImportant == 'PRINT':
             if nexToken[1] == 'SEMICOLON':
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'OCB':
@@ -158,10 +183,11 @@ def verify(token, file, s):
         lastImportant = token[1]
         subImportant = ''
         if nexToken[1] != 'VOID':
-            cbList.append(f'ERROR: Column {token[2]} - Line {token[3]}')
+            cbList.append(f'ERROR: Column {token[2]} - Line {token[3]}')  # Frase retornada caso esta chave não possua fechamento
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'CCB':
@@ -171,6 +197,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {token[2]} - Line {token[3]}')
+            return True
 
 
     elif token[1] == 'PRINT':
@@ -181,6 +208,7 @@ def verify(token, file, s):
                 print('OK')
             else:
                 print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+                return True
 
 
     elif token[1] == 'CS - S':
@@ -189,6 +217,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'CS - V - INT' or token[1] == 'CS - V - FLOAT' or token[1] == 'CS - V - CHAR':
@@ -197,6 +226,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'SEMICOLON':
@@ -210,6 +240,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'EQUAL':
@@ -219,6 +250,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] in arithmetichOperators:
@@ -230,6 +262,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] == 'TRUE' or token[1] == 'FALSE':
@@ -238,6 +271,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
     elif token[1] == 'BREAK':
         nexToken = file[s].split('~')
@@ -245,6 +279,7 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     elif token[1] in logicalOperators:
@@ -253,7 +288,9 @@ def verify(token, file, s):
             print('OK')
         else:
             print(f'ERROR: Column {nexToken[2]} - Line {nexToken[3]}')
+            return True
 
 
     else:
         print(f'ERROR: Column {token[2]} - Line {token[3]}')
+        return True

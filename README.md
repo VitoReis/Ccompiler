@@ -45,16 +45,17 @@ Para criação do *Parser* é aconselhável a criação de uma tabela de IDs par
 
 ___
 ## Parser
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_**Em desenvolvimento**_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O Parser foi dividido em apenas duas funções, uma responsavel por fazer a leitura da saida do analisador lexico e outra pro verificar se a ordem dos token esta correta
 
+#### &nbsp;&nbsp;&nbsp;MyParser:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Esta função fica encarregada de fazer as leituras do arquivo **lexOutput**, sendo este o segundo arquivo gerado pelo lexicalAnalyzer para facilitar a leitura do compilador, MyParser lê os tokens linha por linha e os envia para a função verify que por sua vez retorna um True caso encontre um erro e não retorna nada caso esteja tudo certo, em caso de erro a função myParser procura a quebra de linha ou inicio de bloco mais proximo para continuar a leitura sem maiores problemas.
+
+#### &nbsp;&nbsp;&nbsp;Verify:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Esta função recebe como parametros o token, com seu conteudo, linha e coluna, o arquivo e um index para leitura da proxima linha do arquivo, ela então verifica o Token atual e verifica se o proximo Token depois deste esta correto, caso ele esteja nada acontece, caso não esteja retorna um valor verdadeiro para **error** na função MyParser.
 ___
 ## Semantic Analyzer
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_**Em desenvolvimento**_
 
 ___
 ### OBS:
-* Ao escrever um código em C para teste é obrigatório soltar um espaço a direita dos números quando estes forem seguidos de um caracter que não seja ',' ou ';'.
-
-* O analisador possui limitações, ele reconhece apenas códigos simples da linguagem C.
-
-* O compilador ainda não esta completo, então o analisador léxico será atualizado posteriormente com a função createToken recebendo IDs reais ao invés de strings.
+* O analisador possui limitações, ele reconhece apenas códigos simples da linguagem C e não possui totas as palavras reservadas e operadores da linguagem original.

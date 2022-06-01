@@ -30,24 +30,24 @@ def lexical():
             charA = previousRead
 
 
-        if not charA:                                                               #Caso programa tenha terminado
-            print(f'Finished with {errors} errors')
+        if not charA:                                                               # Caso programa tenha terminado
+            print(f'Lexical analyzer finished with {errors} errors')
             break
-        elif (re.match(identifierNumber, charA)):                                   #Verifica inteiros e flutuantes
+        elif (re.match(identifierNumber, charA)):                                   # Verifica inteiros e flutuantes
             tokenCreated, previousRead, column = tokenNumber(charA, file, column, line)
             treatment = True
-        elif (re.match(identifierWord, charA)):                                     #Verifica palavras reservadas e identificadores
+        elif (re.match(identifierWord, charA)):                                     # Verifica palavras reservadas e identificadores
             tokenCreated, previousRead, column = tokenReservedOrId(charA, file, column, line)
             treatment = True
-        elif charA == '"':                                                          #Verifica se é um conjunto de caracteres
+        elif charA == '"' or charA == '\'':                                         # Verifica se é um conjunto de caracteres
             tokenCreated, column, jump = tokenCharacterSet(charA, file, column, line)
-        elif charA in logicOperatorsList or charA in arithmeticOperatorsList:       #Verifica se é um operador
+        elif charA in logicOperatorsList or charA in arithmeticOperatorsList:       # Verifica se é um operador
             tokenCreated, treatment, previousRead = tokenOperator(charA, file, column, line)
             if tokenCreated:
                 column += 1
-        elif charA in literalsList:                                                 #Verifica se é um literal
+        elif charA in literalsList:                                                 # Verifica se é um literal
             tokenCreated = tokenLiterals(charA, column, line)
-        elif re.match(identifierSpaces, charA):                              #Verifica espaçamentos e quebras de linha
+        elif re.match(identifierSpaces, charA):                              # Verifica espaçamentos e quebras de linha
             if charA == '\n':
                 line += 1
             tokenCreated = True
@@ -118,14 +118,20 @@ def tokenCharacterSet(charA, file, column, line):                 #Encontra conj
     charB = file.read(1)
     buff += charB
     tokenColumn = column
-    identifier = re.compile("^\".*?\"$")
+    identifier = re.compile('^\".*?\"$')
+    identifierCharCaracter = re.compile('^\'.?\'$')
     if charB == '"':                                        #Se charB for o fim da string ja termina
         column += 1
         if re.match(identifier, buff):
             createToken(buff, 'CS - S', tokenColumn, line)
             tokenCreated = True
+    elif charB == '\'':
+        column += 1
+        if re.match(identifierCharCaracter, buff):
+            createToken(buff, 'CHAR - VALUE', tokenColumn, line)
+            tokenCreated = True
     else:
-        while charB != '"' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
+        while charB != '"' and charB != '\'' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
             if not charB:
                 break
             charB = file.read(1)
@@ -141,6 +147,9 @@ def tokenCharacterSet(charA, file, column, line):                 #Encontra conj
             else:
                 createToken(buff, 'CS - S', tokenColumn, line)
                 tokenCreated = True
+        elif re.match(identifierCharCaracter, buff):
+            createToken(buff, 'CHAR - VALUE', tokenColumn, line)
+            tokenCreated = True
         else:
             column = column - len(buff)
 

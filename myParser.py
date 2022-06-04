@@ -1,9 +1,10 @@
 lastImportant = ''
-subImportant = ''
 
 logicalOperators = ['GT', 'LT', 'EE', 'GE', 'LE', 'DIF', 'OR']
 arithmetichOperators = ['ADD', 'SUB', 'MULT', 'DIV']
 cbList = []
+
+declarationList = []
 
 def myParser():
     file = open('lexOutput.txt','r').readlines()
@@ -30,67 +31,44 @@ def myParser():
 
 
 def verify(token, file, s):
-    global lastImportant, subImportant, logicalOperators, arithmetichOperators, cbList
-    if token[1] == 'VOID':
-        nexToken = file[s].split('~')
-        if nexToken[1] == 'ID':
-            lastImportant = token[1]
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
-            return True
+    global lastImportant, logicalOperators, arithmetichOperators, cbList
 
-    elif token[1] == 'ID':
+    if token[1] == 'ID':
         nexToken = file[s].split('~')
-        if lastImportant == 'VOID' and subImportant == 'INT' or subImportant == 'FLOAT' or subImportant == 'CHAR':
-            if nexToken[1] == 'COMMA':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'VOID':
-            if nexToken[1] == 'OP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'INT' or lastImportant == 'FLOAT' or lastImportant == 'CHAR':
+        if lastImportant == 'INT' or lastImportant == 'FLOAT' or lastImportant == 'CHAR':
             if nexToken[1] == 'COMMA' or nexToken[1] == 'SEMICOLON' or nexToken[1] == 'EQUAL':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
             if nexToken[1] == 'EQUAL' or nexToken[1] == 'SEMICOLON':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'EQUAL':
             if nexToken[1] in arithmetichOperators or nexToken[1] == 'SEMICOLON':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'PRINT':
             if nexToken[1] == 'CP':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
             if nexToken[1] in logicalOperators or nexToken[1] == 'CP':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'WHILE':
@@ -101,33 +79,25 @@ def verify(token, file, s):
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'INT' or token[1] == 'FLOAT' or token[1] == 'CHAR':
         nexToken = file[s].split('~')
-        if lastImportant == 'VOID':
-            if nexToken[1] == 'ID':
-                subImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
+        if lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
             if nexToken[1] == 'ID':
                 lastImportant = token[1]
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'ID':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'CHAR - VALUE':
@@ -137,14 +107,14 @@ def verify(token, file, s):
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'CP':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'NUM - INT' or token[1] == 'NUM - FLOAT':
@@ -154,32 +124,25 @@ def verify(token, file, s):
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'CP' or nexToken[1] in arithmetichOperators:
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'OP':
         nexToken = file[s].split('~')
-        if lastImportant == 'VOID':
-            if nexToken[1] == 'CP' or nexToken[1] == 'INT' or nexToken[1] == 'FLOAT':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'PRINT':
+        if lastImportant == 'PRINT':
             if nexToken[1] == 'CS - V - INT' or nexToken[1] == 'CS - V - FLOAT' or nexToken[1] == 'CS - V - CHAR' \
                                                                                 or nexToken[1] == 'CS - S':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
             if nexToken[1] == 'ID' or nexToken[1] == 'INT' or nexToken[1] == 'FLOAT' \
@@ -189,38 +152,26 @@ def verify(token, file, s):
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'CP':
         nexToken = file[s].split('~')
-        if lastImportant == 'VOID' or lastImportant == 'WHILE':
-            if nexToken[1] == 'OCB':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'PRINT':
+        if lastImportant == 'PRINT':
             if nexToken[1] == 'SEMICOLON':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'OCB':
         nexToken = file[s].split('~')
         lastImportant = token[1]
-        subImportant = ''
-        if nexToken[1] != 'VOID':
-            line = token[3].split('\n')[0]
-            cbList.append(f'Semantic error in line: {line} column: {token[2]}')  # Frase retornada caso esta chave não possua fechamento
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
-            return True
+        line = token[3].split('\n')[0]
+        cbList.append(f'Syntactic error on line: {line} column: {token[2]}')  # Frase retornada caso esta chave não possua fechamento
+        return False
+
 
     elif token[1] == 'CCB':
         lastImportant = token[1]
@@ -229,7 +180,7 @@ def verify(token, file, s):
             return False
         else:
             line = token[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {token[2]}')
+            print(f'Syntactic error on line: {line} column: {token[2]}')
             return True
 
     elif token[1] == 'PRINT':
@@ -240,7 +191,7 @@ def verify(token, file, s):
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
                 return True
 
     elif token[1] == 'CS - S':
@@ -249,7 +200,7 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] == 'CS - V - INT' or token[1] == 'CS - V - FLOAT' or token[1] == 'CS - V - CHAR':
@@ -258,7 +209,7 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] == 'SEMICOLON':
@@ -271,7 +222,7 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] == 'EQUAL':
@@ -281,7 +232,7 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] in arithmetichOperators:
@@ -289,12 +240,12 @@ def verify(token, file, s):
         if token[1] == 'DIV':
             if nexToken[0] == '0':
                 line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
         elif nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT':
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] == 'TRUE' or token[1] == 'FALSE':
@@ -303,17 +254,18 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     elif token[1] == 'BREAK':
         nexToken = file[s].split('~')
-        if nexToken[1] == 'SEMICOLON':
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
-            return True
+        if lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
+            if nexToken[1] == 'SEMICOLON':
+                return False
+            else:
+                line = nexToken[3].split('\n')[0]
+                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
+                return True
 
     elif token[1] in logicalOperators:
         nexToken = file[s].split('~')
@@ -321,10 +273,10 @@ def verify(token, file, s):
             return False
         else:
             line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
+            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
             return True
 
     else:
         line = token[3].split('\n')[0]
-        print(f'Semantic error in line: {line} column: {token[2]}')
+        print(f'Syntactic error on line: {line} column: {token[2]}')
         return True

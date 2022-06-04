@@ -70,8 +70,7 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {'void':  ['void', 'VOID'],       # 'for':    ['for', 'FOR'],
-                        'int':    ['int', 'INT'],
+    reservedWordsDict = {'int':    ['int', 'INT'],          #'void':  ['void', 'VOID'],'for':    ['for', 'FOR'],
                         'float':  ['float', 'FLOAT'],
                         'char':   ['char', 'CHAR'],
                         'printf': ['printf', 'PRINT'],
@@ -79,6 +78,7 @@ def tokenReservedOrId(charA, file, column, line):
                         'true':   ['true', 'TRUE'],
                         'false':  ['false', 'FALSE'],
                         'break':  ['break', 'BREAK']}
+
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
     buff = ''

@@ -20,7 +20,8 @@ def myParser():
                 token = file[s].split('~')
                 if token[1] == 'SEMICOLON' or token[1] == 'OCB':
                     break
-                s += 1
+                else:                                               # alterado aq, verificar erros posteriormente
+                    s += 1
             errorCount += 1
         s += 1
 
@@ -237,12 +238,13 @@ def verify(token, file, s):
 
     elif token[1] in arithmetichOperators:
         nexToken = file[s].split('~')
-        if token[1] == 'DIV':
-            if nexToken[0] == '0':
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-        elif nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT':
-            return False
+        if nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT':
+            if token[1] == 'DIV':
+                if nexToken[0] == '0':
+                    line = nexToken[3].split('\n')[0]
+                    print(f'Syntactic error on line: {line} column: {nexToken[2]}')
+            else:
+                return False
         else:
             line = nexToken[3].split('\n')[0]
             print(f'Syntactic error on line: {line} column: {nexToken[2]}')

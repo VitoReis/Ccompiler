@@ -86,7 +86,7 @@ def verify(token, file, s):
                 print(f'Semantic error in line: {line} column: {nexToken[2]}')
                 return True
         elif lastImportant == 'WHILE':
-            if nexToken[1] in logicalOperators or nexToken[1] == 'CP':       # or nexToken[1] == 'CP'
+            if nexToken[1] in logicalOperators or nexToken[1] == 'CP':
                 return False
             else:
                 line = nexToken[3].split('\n')[0]
@@ -114,7 +114,7 @@ def verify(token, file, s):
                 line = nexToken[3].split('\n')[0]
                 print(f'Semantic error in line: {line} column: {nexToken[2]}')
                 return True
-        elif lastImportant == 'OCB' or lastImportant == 'SEMICOLON':                 # VERIFICAR POSTERIORMENTE
+        elif lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
             if nexToken[1] == 'ID':
                 lastImportant = token[1]
                 return False
@@ -234,7 +234,7 @@ def verify(token, file, s):
 
     elif token[1] == 'PRINT':
         nexToken = file[s].split('~')
-        if lastImportant == 'OCB' or lastImportant == 'SEMICOLON':                 # VERIFICAR POSTERIORMENTE
+        if lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
             if nexToken[1] == 'OP':
                 lastImportant = token[1]
                 return False

@@ -7,6 +7,7 @@ cbList = []
 declarationList = []
 
 def myParser():
+    global lastImportant
     file = open('lexOutput.txt','r').readlines()
     s = 0
     error = False
@@ -20,8 +21,9 @@ def myParser():
                 token = file[s].split('~')
                 if token[1] == 'SEMICOLON' or token[1] == 'OCB':
                     break
-                else:                                               # alterado aq, verificar erros posteriormente
+                else:
                     s += 1
+            lastImportant = ''
             errorCount += 1
         s += 1
 

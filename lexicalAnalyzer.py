@@ -10,9 +10,9 @@ def lexical():
     identifierWord = ("[a-zA-Z]")
     identifierSpaces = ("[\s\\n\\t]")
     previousRead = ''
-    logicOperatorsList = ['>', '<']                             # REMOVED: '!', '&', '|'
-    arithmeticOperatorsList = ['+', '-', '*', '/', '=']         # '%',
-    literalsList = ['(', ')', '[', ']', '{', '}', ',', ';']
+    logicOperatorsList = ['>', '<']
+    arithmeticOperatorsList = ['+', '-', '*', '/', '=']
+    literalsList = ['(', ')', '{', '}', ',', ';']
 
     file = open('code.c', 'r')
 
@@ -70,7 +70,7 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {'int':    ['int', 'INT'],          #'void':  ['void', 'VOID'],'for':    ['for', 'FOR'],
+    reservedWordsDict = {'int':    ['int', 'INT'],
                         'float':  ['float', 'FLOAT'],
                         'char':   ['char', 'CHAR'],
                         'printf': ['printf', 'PRINT'],
@@ -191,7 +191,7 @@ def tokenOperator(charA, file, column, line):
     treatment = False
     charB = file.read(1)
     buff = charA + charB
-    logicOperatorsDict = {'>': ['>', 'GT'],           # REMOVED ('!'): ['!', 'LO'], ('&'): ['&', 'LO'], ('&&'): ['&&', 'LO'], ('|'): ['|', 'LO']
+    logicOperatorsDict = {'>': ['>', 'GT'],
                           '<': ['<', 'LT'],
                           '==': ['==', 'EE'],
                           '>=': ['>=', 'GE'],
@@ -199,7 +199,7 @@ def tokenOperator(charA, file, column, line):
                           '!=': ['!=', 'DIF'],
                           '||': ['||', 'OR']}
 
-    arithmeticOperatorsDict = {'+': ['+', 'ADD'],         # REMOVED # ('%'): ['%', 'AO'], ('+='): ['+=', 'AO'], ('-='): ['-=', 'AO'], ('*='): ['*=', 'AO'], ('/='): ['/=', 'AO'], ('++'): ['++', 'ADDO'],('--'): ['--', 'SUBO'],
+    arithmeticOperatorsDict = {'+': ['+', 'ADD'],
                                '-': ['-', 'SUB'],
                                '*': ['*', 'MULT'],
                                '/': ['/', 'DIV'],
@@ -226,8 +226,6 @@ def tokenLiterals(charA, column, line):
     tokenColumn = column
     literalsDict = {    '(': ['(', 'OP'],
                         ')': [')', 'CP'],
-                        '[': ['[', 'OB'],
-                        ']': [']', 'CB'],
                         '{': ['{', 'OCB'],
                         '}': ['}', 'CCB'],
                         ',': [',', 'COMMA'],

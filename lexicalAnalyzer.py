@@ -70,14 +70,14 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {'int':    ['int', 'INT'],
-                        'float':  ['float', 'FLOAT'],
-                        'char':   ['char', 'CHAR'],
-                        'printf': ['printf', 'PRINT'],
-                        'while':  ['while', 'WHILE'],
-                        'true':   ['true', 'TRUE'],
-                        'false':  ['false', 'FALSE'],
-                        'break':  ['break', 'BREAK']}
+    reservedWordsDict = {'int'  :   ['int', 'INT'],
+                        'float' :   ['float', 'FLOAT'],
+                        'char'  :   ['char', 'CHAR'],
+                        'printf':   ['printf', 'PRINT'],
+                        'while' :   ['while', 'WHILE'],
+                        'true'  :   ['true', 'TRUE'],
+                        'false' :   ['false', 'FALSE'],
+                        'break' :   ['break', 'BREAK']}
 
     identifier = re.compile("[a-zA-Z_0-9]")
     charB = file.read(1)
@@ -234,7 +234,6 @@ def tokenLiterals(charA, column, line):
     if charA in literalsDict:
         createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColumn, line)
         tokenCreated = True
-
     return tokenCreated
 
 def createToken(content, token, tokenColumn, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela

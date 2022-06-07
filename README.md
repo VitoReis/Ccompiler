@@ -60,7 +60,7 @@ ___
 ### OBS:
 * O analisador possui limitações, ele reconhece apenas códigos simples da linguagem C e não possui totas as palavras reservadas e operadores da linguagem original.
 * O que o compilador reconhece:
-  * Palavras reservadas: int, float, char, while, printf, true, false, break.
+  * Palavras reservadas: void, int, float, char, while, printf, true, false, break.
     * printf serve para strings e para imprimir apenas uma variável
     * true e false são reconhecidos apenas dentro de um while
   * Operações aritméticas: + - * / =

@@ -70,7 +70,8 @@ def lexical():
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {'int'  :   ['int', 'INT'],
+    reservedWordsDict = {'void':    ['void', 'VOID'],
+                        'int'  :    ['int', 'INT'],
                         'float' :   ['float', 'FLOAT'],
                         'char'  :   ['char', 'CHAR'],
                         'printf':   ['printf', 'PRINT'],
@@ -163,8 +164,8 @@ def tokenNumber(charA, file, column, line):
     tokenCreated = False
     identifier = re.compile("[0-9\.]")
     identifierDetach = re.compile("[\s\n\t;,)\]+\-*/><=!|]")
-    identifierInt = re.compile("^[0-9][0-9]*?$")
-    identifierFloat = re.compile("^[0-9][0-9]*?\.[0-9]*?[0-9]$")
+    identifierInt = re.compile("^[0-9]+?$")             # ^[0-9][0-9]*?$
+    identifierFloat = re.compile("^[0-9]+\.[0-9]+$")    # ^[0-9][0-9]*?\.[0-9]*?[0-9]$
 
     while (re.match(identifier, charB)):                            #Verifica se o caracter é um numero ou .
         buff += charB
@@ -172,9 +173,10 @@ def tokenNumber(charA, file, column, line):
     tokenColumn = column
     column = column + len(buff)
 
-    if not (re.match(identifierDetach, charB)):                     #Se nao terminar com separador retorna erro
-        column = column - len(buff)
-        return tokenCreated, ' ', column
+    if charB:
+        if not (re.match(identifierDetach, charB)):                     #Se nao terminar com separador retorna erro
+            column = column - len(buff)
+            return tokenCreated, ' ', column
 
     if re.match(identifierInt, buff):                               #Verifica se é um inteiro
         createToken(buff, 'NUM - INT', tokenColumn, line)
@@ -224,12 +226,12 @@ def tokenOperator(charA, file, column, line):
 
 def tokenLiterals(charA, column, line):
     tokenColumn = column
-    literalsDict = {    '(': ['(', 'OP'],
-                        ')': [')', 'CP'],
-                        '{': ['{', 'OCB'],
-                        '}': ['}', 'CCB'],
-                        ',': [',', 'COMMA'],
-                        ';': [';', 'SEMICOLON']}
+    literalsDict = {'(': ['(', 'OP'],
+                    ')': [')', 'CP'],
+                    '{': ['{', 'OCB'],
+                    '}': ['}', 'CCB'],
+                    ',': [',', 'COMMA'],
+                    ';': [';', 'SEMICOLON']}
 
     if charA in literalsDict:
         createToken(literalsDict.get(charA)[0], literalsDict.get(charA)[1], tokenColumn, line)

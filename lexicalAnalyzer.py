@@ -10,7 +10,7 @@ def lexical():
     identifierWord = ("[a-zA-Z]")
     identifierSpaces = ("[\s\\n\\t]")
     previousRead = ''
-    logicOperatorsList = ['>', '<']
+    logicOperatorsList = ['>', '<', '|']
     arithmeticOperatorsList = ['+', '-', '*', '/', '=']
     literalsList = ['(', ')', '{', '}', ',', ';']
 

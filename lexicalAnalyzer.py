@@ -31,6 +31,7 @@ def lexical():
 
 
         if not charA:                                                               # Caso programa tenha terminado
+            createToken('$', '$', '$', '$')
             print(f'Lexical analyzer finished with {errors} errors')
             break
         elif (re.match(identifierNumber, charA)):                                   # Verifica inteiros e flutuantes
@@ -56,24 +57,27 @@ def lexical():
             tokenCreated = False
 
         if tokenCreated == False:
-            print(f"Lexical error in line: {line} column: {column}")          #Mostra a linha do erro
+            print(f"Lexical error in line: {line} column: {column}")            # Mostra a linha do erro
             print(f"Error starts in: {charA}")
-            createToken('------MISSING TOKEN------','ERROR',column,line)     #Imprime o erro no arquivo de saida
+            createToken('------MISSING TOKEN------', 'ERROR', column, line)     # Imprime o erro no arquivo de saida
             if jump:
-                charA = file.readline()                                     #Pula a linha com erro
+                charA = file.readline()                                         # Pula a linha com erro
             else:
                 jump = True
-            line += 1                                                       #Adiciona mais um a linha pois ela foi pulada
-            column = 0                                                       #Zera a coluna
+            line += 1                                                   # Adiciona mais 1 na linha, pois ela foi pulada
+            column = 0                                                  # Zera a coluna
             errors += 1
     file.close()
+    return errors
 
 
 def tokenReservedOrId(charA, file, column, line):
-    reservedWordsDict = {'void':    ['void', 'VOID'],
-                        'int'  :    ['int', 'INT'],
+    reservedWordsDict = {'void' :   ['void', 'VOID'],
+                        'int'   :   ['int', 'INT'],
                         'float' :   ['float', 'FLOAT'],
                         'char'  :   ['char', 'CHAR'],
+                        'if'    :   ['if', 'IF'],
+                        'else'  :   ['else', 'ELSE'],
                         'printf':   ['printf', 'PRINT'],
                         'while' :   ['while', 'WHILE'],
                         'true'  :   ['true', 'TRUE'],
@@ -111,9 +115,6 @@ def tokenReservedOrId(charA, file, column, line):
 def tokenCharacterSet(charA, file, column, line):                 #Encontra conjuntos de caracteres usando regex
     tokenCreated = False
     jump = True
-    characterSetDict = {'"%i"':   ['"%i"', 'CS - V - INT'],
-                        '"%f"':   ['"%f"', 'CS - V - FLOAT'],
-                        '"%c"':   ['"%c"', 'CS - V - CHAR']}
     buff = ''
     buff += charA
     charB = file.read(1)
@@ -124,7 +125,7 @@ def tokenCharacterSet(charA, file, column, line):                 #Encontra conj
     if charB == '"':                                        #Se charB for o fim da string ja termina
         column += 1
         if re.match(identifier, buff):
-            createToken(buff, 'CS - S', tokenColumn, line)
+            createToken(buff, 'STRING', tokenColumn, line)
             tokenCreated = True
     elif charB == '\'':
         column += 1
@@ -132,7 +133,7 @@ def tokenCharacterSet(charA, file, column, line):                 #Encontra conj
             createToken(buff, 'CHAR - VALUE', tokenColumn, line)
             tokenCreated = True
     else:
-        while charB != '"' and charB != '\'' and charB != '\n':                                 #Se charB nao for o fim da string adiciona no buff ate acabar
+        while charB != '"' and charB != '\'' and charB != '\n':     #Se charB nao for o fim da string adiciona no buff ate acabar
             if not charB:
                 break
             charB = file.read(1)
@@ -142,11 +143,7 @@ def tokenCharacterSet(charA, file, column, line):                 #Encontra conj
         if charB == '\n':
             jump = False
         elif re.match(identifier, buff):                      #Ao acabar verifica o tipo de conjunto
-            if buff in characterSetDict:
-                createToken(characterSetDict.get(buff)[0], characterSetDict.get(buff)[1], tokenColumn, line)
-                tokenCreated = True
-            else:
-                createToken(buff, 'CS - S', tokenColumn, line)
+                createToken(buff, 'STRING', tokenColumn, line)
                 tokenCreated = True
         elif re.match(identifierCharCaracter, buff):
             createToken(buff, 'CHAR - VALUE', tokenColumn, line)
@@ -238,7 +235,7 @@ def tokenLiterals(charA, column, line):
         tokenCreated = True
     return tokenCreated
 
-def createToken(content, token, tokenColumn, tokenLine):                        #Aqui o token é passado e escrito na saida de acordo com a tabela
+def createToken(content, token, tokenColumn, tokenLine):   # O token é passado e escrito na saida de acordo com a tabela
     output = open('lexOutput.txt','a')
     userOutput = open('lexUserOutput.txt','a')
     output.write(f'{content}~{token}~{tokenColumn}~{tokenLine}\n')

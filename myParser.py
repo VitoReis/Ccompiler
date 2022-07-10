@@ -1,397 +1,832 @@
-lastImportant = ''
-subImportant = ''
+import os
 
-logicalOperators = ['GT', 'LT', 'EE', 'GE', 'LE', 'DIF', 'OR']
-arithmetichOperators = ['ADD', 'SUB', 'MULT', 'DIV']
-cbList = []
+lastImportant = []
+ED = ['EE', 'DIF']
+GLE = ['GT', 'LT', 'GE', 'LE', 'OR']
+AO = ['ADD', 'SUB', 'MULT', 'DIV']
 
-declarationList = []
+prints = []
+declarations = []
+types = []
+values = []
+ids = []
 
 def myParser():
-    global lastImportant
-    file = open('lexOutput.txt','r').readlines()
+    file = open('lexOutput.txt', 'r').readlines()
     s = 0
     token = file[s].split('~')
-    if token[1] != 'VOID':
-        line = token[3].split('\n')[0]
-        print(f'Syntactic error on line: {line} column: {token[2]}')
-        errorCount = 1
-    else:
-        error = False
-        errorCount = 0
-
-        while s < len(file):
-            token = file[s].split('~')
-            error = verify(token, file, s+1)
-            if error:
-                while s < len(file):
-                    token = file[s].split('~')
-                    if token[1] == 'SEMICOLON' or token[1] == 'OCB':
-                        break
-                    else:
-                        s += 1
-                if token[1] == 'OCB':
-                    lastImportant = token[1]
-                    line = token[3].split('\n')[0]
-                    cbList.append(f'Syntactic error on line: {line} column: {token[2]}')
-                    errorCount += 1
-                elif token[1] == 'SEMICOLON':
-                    lastImportant = 'SEMICOLON'
-                    errorCount += 1
-            s += 1
-
-    if len(cbList) > 0:
-        print(cbList[len(cbList)-1])
-        errorCount += 1
-    print(f'Parser finished with {errorCount} errors')
-
-
-def verify(token, file, s):
-    global lastImportant, logicalOperators, arithmetichOperators, cbList,subImportant
-
-    if token[1] == 'VOID':
-        nexToken = file[s].split('~')
-        if nexToken[1] == 'ID':
-            lastImportant = token[1]
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
-            return True
-
-    elif token[1] == 'ID':
-        nexToken = file[s].split('~')
-        if lastImportant == 'VOID' and subImportant == 'INT' or lastImportant == 'VOID' and subImportant == 'FLOAT' or \
-                                                                    lastImportant == 'VOID' and subImportant == 'CHAR':
-            if nexToken[1] == 'COMMA' or nexToken[1] == 'CP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'VOID':
-            if nexToken[1] == 'OP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'INT' or lastImportant == 'FLOAT' or lastImportant == 'CHAR':
-            if nexToken[1] == 'COMMA' or nexToken[1] == 'SEMICOLON' or nexToken[1] == 'EQUAL':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
-            if nexToken[1] == 'EQUAL' or nexToken[1] == 'SEMICOLON':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'EQUAL' or lastImportant in arithmetichOperators:
-            if nexToken[1] in arithmetichOperators or nexToken[1] == 'SEMICOLON':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'PRINT':
-            if nexToken[1] == 'CP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'WHILE':
-            if nexToken[1] in logicalOperators or nexToken[1] == 'CP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
-    elif token[1] == 'WHILE':
-        nexToken = file[s].split('~')
-        if lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
-            if nexToken[1] == 'OP':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'INT' or token[1] == 'FLOAT' or token[1] == 'CHAR':
-        nexToken = file[s].split('~')
-        if lastImportant == 'VOID':
-            if nexToken[1] == 'ID':
-                subImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
-            if nexToken[1] == 'ID':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'WHILE':
-            if nexToken[1] == 'ID':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
-    elif token[1] == 'CHAR - VALUE':
-        nexToken = file[s].split('~')
-        if lastImportant == 'EQUAL':
-            if nexToken[1] == 'SEMICOLON':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'WHILE':
-            if nexToken[1] == 'CP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'NUM - INT' or token[1] == 'NUM - FLOAT':
-        nexToken = file[s].split('~')
-        if lastImportant == 'EQUAL' or lastImportant in arithmetichOperators:
-            if nexToken[1] in arithmetichOperators or nexToken[1] == 'SEMICOLON':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'WHILE':
-            if nexToken[1] == 'CP' or nexToken[1] in logicalOperators:
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'OP':
-        nexToken = file[s].split('~')
-        if lastImportant == 'VOID':
-            if nexToken[1] == 'CP' or nexToken[1] == 'INT' or nexToken[1] == 'FLOAT':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Semantic error in line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'PRINT':
-            if nexToken[1] == 'CS - V - INT' or nexToken[1] == 'CS - V - FLOAT' or nexToken[1] == 'CS - V - CHAR' \
-                                                                                or nexToken[1] == 'CS - S':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'WHILE':
-            if nexToken[1] == 'ID' or nexToken[1] == 'TRUE' or nexToken[1] == 'FALSE' or nexToken[1] == 'NUM - INT'\
-                                                                                        or nexToken[1] == 'NUM - FLOAT':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
-
-    elif token[1] == 'CP':
-        nexToken = file[s].split('~')
-        if lastImportant == 'VOID' or lastImportant == 'WHILE':
-            if nexToken[1] == 'OCB':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif lastImportant == 'PRINT':
-            if nexToken[1] == 'SEMICOLON':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
-    elif token[1] == 'OCB':
-        nexToken = file[s].split('~')
-        if nexToken[1] != 'VOID':
-            lastImportant = token[1]
-            line = token[3].split('\n')[0]
-            cbList.append(f'Syntactic error on line: {line} column: {token[2]}')  # Frase retornada caso esta chave não possua fechamento
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Semantic error in line: {line} column: {nexToken[2]}')
-            return True
-
-
-
-    elif token[1] == 'CCB':
-        lastImportant = token[1]
-        if len(cbList) >= 1:
-            cbList.pop()
-            return False
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
+    if token[1] == 'ID':
+        ID(file, s + 1)
+        print(f'Parser finished with 0 errors')
+    elif token[1] == 'INT':
+        INT(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
+    elif token[1] == 'FLOAT':
+        FLOAT(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
+    elif token[1] == 'CHAR':
+        CHAR(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
     elif token[1] == 'PRINT':
-        nexToken = file[s].split('~')
-        if lastImportant == 'OCB' or lastImportant == 'SEMICOLON':
-            if nexToken[1] == 'OP':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
-    elif token[1] == 'CS - S':
-        nexToken = file[s].split('~')
-        if lastImportant == 'OP':
-            if nexToken[1] == 'CP':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'CS - V - INT' or token[1] == 'CS - V - FLOAT' or token[1] == 'CS - V - CHAR':
-        nexToken = file[s].split('~')
-        if lastImportant == 'OP':
-            if nexToken[1] == 'COMMA':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'SEMICOLON':
-        lastImportant = token[1]
-        return False
-
-    elif token[1] == 'COMMA':
-        nexToken = file[s].split('~')
-        if lastImportant == 'VOID':
-            if nexToken[1] == 'INT' or nexToken[1] == 'FLOAT' or nexToken[1] == 'CHAR':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        elif nexToken[1] == 'ID':
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-            return True
-
-    elif token[1] == 'EQUAL':
-        nexToken = file[s].split('~')
-        if lastImportant == 'ID' or lastImportant == 'NUM - INT' or lastImportant == 'NUM - FLOAT' or lastImportant == 'CHAR - VALUE':
-            if nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT' or nexToken[1] == 'CHAR - VALUE':
-                lastImportant = token[1]
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] in arithmetichOperators:
-        nexToken = file[s].split('~')
-        if lastImportant == 'ID' or lastImportant == 'NUM - INT' or lastImportant == 'NUM - FLOAT':
-            if nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT':
-                lastImportant = token[1]
-                if token[1] == 'DIV':
-                    if nexToken[0] == '0':
-                        line = nexToken[3].split('\n')[0]
-                        print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                else:
-                    return False
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] in logicalOperators:
-        nexToken = file[s].split('~')
-        if lastImportant == 'ID' or lastImportant == 'NUM - INT' or lastImportant == 'NUM - FLOAT' or lastImportant == 'CHAR - VALUE':
-            if nexToken[1] == 'ID' or nexToken[1] == 'NUM - INT' or nexToken[1] == 'NUM - FLOAT' or nexToken[1] == 'CHAR - VALUE':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-        else:
-            line = token[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {token[2]}')
-            return True
-
-    elif token[1] == 'TRUE' or token[1] == 'FALSE':
-        nexToken = file[s].split('~')
-        if nexToken[1] == 'CP':
-            return False
-        else:
-            line = nexToken[3].split('\n')[0]
-            print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-            return True
-
+        PRINTF(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
+    elif token[1] == 'WHILE':
+        WHILE(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
+    elif token[1] == 'IF':
+        IF(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
     elif token[1] == 'BREAK':
-        nexToken = file[s].split('~')
-        if lastImportant == 'SEMICOLON' or lastImportant == 'OCB':
-            if nexToken[1] == 'SEMICOLON':
-                return False
-            else:
-                line = nexToken[3].split('\n')[0]
-                print(f'Syntactic error on line: {line} column: {nexToken[2]}')
-                return True
-
+        BREAK(file, s + 1)
+        print(f'Parser finished with 0 errors')
+        return 0
+    elif token[1] == '$':
+        print(f'Parser finished with 0 errors')
+        return 0
     else:
-        line = token[3].split('\n')[0]
-        print(f'Syntactic error on line: {line} column: {token[2]}')
-        return True
+        error(file, s - 1)
+
+
+############################################ VARIABLES #################################################################
+def INT(file, s):
+    global lastImportant
+    thisToken = file[s-1].split('~')
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        lastImportant.append('INT')
+        declarations.append(next[0])
+        types.append(f'{thisToken[1]}~{next[0]}')       # Guarda o tipo de cada ID
+        ID(file, s + 1)
+    else:
+        error(file, s)
+
+def FLOAT(file, s):
+    global lastImportant
+    thisToken = file[s-1].split('~')
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        lastImportant.append('FLOAT')
+        declarations.append(next[0])
+        types.append(f'{thisToken[1]}~{next[0]}')
+        ID(file, s + 1)
+    else:
+        error(file, s)
+
+def CHAR(file, s):
+    global lastImportant
+    thisToken = file[s-1].split('~')
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        lastImportant.append('CHAR')
+        declarations.append(next[0])
+        types.append(f'{thisToken[1]}~{next[0]}')
+        ID(file, s + 1)
+    else:
+        error(file, s)
+########################################################################################################################
+
+############################################ RESERVED WORDS ############################################################
+def BREAK(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant)-1] == 'WHILE':
+            if next[1] == 'SEMICOLON':
+                SEMICOLON(file, s + 1)
+            else:
+                error(file, s - 1)
+        else:
+            error(file, s - 1)
+    else:
+        error(file, s)
+
+def WHILE(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if next[1] == 'OP':
+        lastImportant.append('WHILE')
+        OP(file, s + 1)
+    else:
+        error(file, s)
+
+def IF(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if next[1] == 'OP':
+        lastImportant.append('IF')
+        OP(file, s + 1)
+    else:
+        error(file, s)
+
+def ELSE(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant)-1] == 'IF':
+            lastImportant.pop()
+            if next[1] == 'IF':
+                IF(file, s + 1)
+            elif next[1] == 'OCB':
+                OCB(file, s + 1)
+            else:
+                error(file, s)
+        else:
+            error(file, s - 1)
+    else:
+        error(file, s - 1)
+
+def TRUE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'CP':
+        CP(file, s + 1)
+    else:
+        error(file, s)
+
+def FALSE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'CP':
+        CP(file, s + 1)
+    else:
+        error(file, s)
+
+def PRINTF(file, s):
+    global lastImportant
+    thisToken = file[s-1].split('~')
+    next = file[s].split('~')
+    value = file[s+1].split('~')
+    line = thisToken[3].split("\n")[0]
+    if value[1] == 'STRING':
+        prints.append(f'{thisToken[1]}~{line}~{thisToken[2]}~{value[0]}')
+    else:
+        prints.append(f'{thisToken[1]}~{line}~{thisToken[2]}~ ')
+    if next[1] == 'OP':
+        lastImportant.append('PRINT')
+        OP(file, s + 1)
+    else:
+        error(file, s - 1)
+########################################################################################################################
+
+############################################## VALUES ##################################################################
+def NUM_INT(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] == 'WHILE' or lastImportant[len(lastImportant) - 1] == 'IF':
+            if next[1] == 'EE':
+                EE(file, s + 1)
+            elif next[1] == 'DIF':
+                DIF(file, s + 1)
+            elif next[1] == 'GT':
+                GT(file, s + 1)
+            elif next[1] == 'GE':
+                GE(file, s + 1)
+            elif next[1] == 'LT':
+                LT(file, s + 1)
+            elif next[1] == 'LE':
+                LE(file, s + 1)
+            elif next[1] == 'OR':
+                OR(file, s + 1)
+            elif next[1] == 'ADD':
+                ADD(file, s + 1)
+            elif next[1] == 'SUB':
+                SUB(file, s + 1)
+            elif next[1] == 'MULT':
+                MULT(file, s + 1)
+            elif next[1] == 'DIV':
+                DIV(file, s + 1)
+            else:
+                error(file, s)
+        elif next[1] == 'EE':
+            EE(file, s + 1)
+        elif next[1] == 'DIF':
+            DIF(file, s + 1)
+        elif next[1] == 'GT':
+            GT(file, s + 1)
+        elif next[1] == 'GE':
+            GE(file, s + 1)
+        elif next[1] == 'LT':
+            LT(file, s + 1)
+        elif next[1] == 'LE':
+            LE(file, s + 1)
+        elif next[1] == 'OR':
+            OR(file, s + 1)
+        elif next[1] == 'ADD':
+            ADD(file, s + 1)
+        elif next[1] == 'SUB':
+            SUB(file, s + 1)
+        elif next[1] == 'MULT':
+            MULT(file, s + 1)
+        elif next[1] == 'DIV':
+            DIV(file, s + 1)
+        elif next[1] == 'SEMICOLON':
+            SEMICOLON(file, s + 1)
+        else:
+            error(file, s)
+    elif next[1] == 'EE':
+        EE(file, s + 1)
+    elif next[1] == 'DIF':
+        DIF(file, s + 1)
+    elif next[1] == 'GT':
+        GT(file, s + 1)
+    elif next[1] == 'GE':
+        GE(file, s + 1)
+    elif next[1] == 'LT':
+        LT(file, s + 1)
+    elif next[1] == 'LE':
+        LE(file, s + 1)
+    elif next[1] == 'OR':
+        OR(file, s + 1)
+    elif next[1] == 'ADD':
+        ADD(file, s + 1)
+    elif next[1] == 'SUB':
+        SUB(file, s + 1)
+    elif next[1] == 'MULT':
+        MULT(file, s + 1)
+    elif next[1] == 'DIV':
+        DIV(file, s + 1)
+    elif next[1] == 'SEMICOLON':
+        SEMICOLON(file, s + 1)
+    else:
+        error(file, s)
+
+def NUM_FLOAT(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] == 'WHILE' or lastImportant[len(lastImportant) - 1] == 'IF':
+            if next[1] == 'EE':
+                EE(file, s + 1)
+            elif next[1] == 'DIF':
+                DIF(file, s + 1)
+            elif next[1] == 'GT':
+                GT(file, s + 1)
+            elif next[1] == 'GE':
+                GE(file, s + 1)
+            elif next[1] == 'LT':
+                LT(file, s + 1)
+            elif next[1] == 'LE':
+                LE(file, s + 1)
+            elif next[1] == 'OR':
+                OR(file, s + 1)
+            elif next[1] == 'ADD':
+                ADD(file, s + 1)
+            elif next[1] == 'SUB':
+                SUB(file, s + 1)
+            elif next[1] == 'MULT':
+                MULT(file, s + 1)
+            elif next[1] == 'DIV':
+                DIV(file, s + 1)
+            else:
+                error(file, s)
+        if lastImportant[len(lastImportant) - 1] == 'INT' or lastImportant[len(lastImportant) - 1] == 'FLOAT'\
+            or lastImportant[len(lastImportant) - 1] == 'CHAR':
+            if next[1] == 'EE':
+                EE(file, s + 1)
+            elif next[1] == 'DIF':
+                DIF(file, s + 1)
+            elif next[1] == 'GT':
+                GT(file, s + 1)
+            elif next[1] == 'GE':
+                GE(file, s + 1)
+            elif next[1] == 'LT':
+                LT(file, s + 1)
+            elif next[1] == 'LE':
+                LE(file, s + 1)
+            elif next[1] == 'OR':
+                OR(file, s + 1)
+            elif next[1] == 'ADD':
+                ADD(file, s + 1)
+            elif next[1] == 'SUB':
+                SUB(file, s + 1)
+            elif next[1] == 'MULT':
+                MULT(file, s + 1)
+            elif next[1] == 'DIV':
+                DIV(file, s + 1)
+            elif next[1] == 'SEMICOLON':
+                SEMICOLON(file, s + 1)
+            else:
+                error(file, s)
+    if next[1] == 'EE':
+        EE(file, s + 1)
+    elif next[1] == 'DIF':
+        DIF(file, s + 1)
+    elif next[1] == 'GT':
+        GT(file, s + 1)
+    elif next[1] == 'GE':
+        GE(file, s + 1)
+    elif next[1] == 'LT':
+        LT(file, s + 1)
+    elif next[1] == 'LE':
+        LE(file, s + 1)
+    elif next[1] == 'OR':
+        OR(file, s + 1)
+    elif next[1] == 'ADD':
+        ADD(file, s + 1)
+    elif next[1] == 'SUB':
+        SUB(file, s + 1)
+    elif next[1] == 'MULT':
+        MULT(file, s + 1)
+    elif next[1] == 'DIV':
+        DIV(file, s + 1)
+    elif next[1] == 'SEMICOLON':
+        SEMICOLON(file, s + 1)
+    else:
+        error(file, s)
+
+def CHAR_VALUE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'SEMICOLON':
+        SEMICOLON(file, s + 1)
+    else:
+        error(file, s)
+
+def STRING(file, s):
+    # thisToken = file[s-1].split('~')
+    # string = thisToken[0].split('"')
+    next = file[s].split('~')
+    # prints.append(f'print~{string[1]}')
+    if next[1] == 'CP':
+        CP(file, s + 1)
+    else:
+        error(file, s)
+########################################################################################################################
+
+def ID(file, s):
+    global lastImportant
+    thisId = file[s-1].split('~')
+    next = file[s].split('~')
+
+    if not thisId[0] in ids:            # Guarda todos os IDs junto a sua linha e coluna
+        ids.append(f'{thisId[0]}~{thisId[2]}~{thisId[3]}')
+
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant)-1] == 'PRINT':
+            if next[1] == 'CP':
+                CP(file, s + 1)
+            else:
+                error(file, s)
+        elif lastImportant[len(lastImportant)-1] == 'IF' or lastImportant[len(lastImportant)-1] == 'WHILE':
+            if next[1] == 'EE':
+                EE(file, s + 1)
+            elif next[1] == 'DIF':
+                DIF(file, s + 1)
+            elif next[1] == 'EQUAL':
+                EQUAL(file, s + 1)
+            elif next[1] == 'GT':
+                GT(file, s + 1)
+            elif next[1] == 'GE':
+                GE(file, s + 1)
+            elif next[1] == 'LT':
+                LT(file, s + 1)
+            elif next[1] == 'LE':
+                LE(file, s + 1)
+            elif next[1] == 'OR':
+                OR(file, s + 1)
+            elif next[1] == 'ADD':
+                ADD(file, s + 1)
+            elif next[1] == 'SUB':
+                SUB(file, s + 1)
+            elif next[1] == 'MULT':
+                MULT(file, s + 1)
+            elif next[1] == 'DIV':
+                DIV(file, s + 1)
+            elif next[1] == 'CP':
+                CP(file, s + 1)
+            else:
+                error(file, s)
+        elif lastImportant[len(lastImportant) - 1] == 'INT' or lastImportant[len(lastImportant) - 1] == 'FLOAT' or \
+            lastImportant[len(lastImportant)-1] == 'CHAR':
+            if next[1] == 'EQUAL':
+                EQUAL(file, s + 1)
+            elif next[1] == 'COMMA':
+                COMMA(file, s + 1)
+            elif next[1] == 'SEMICOLON':
+                SEMICOLON(file, s + 1)
+            else:
+                error(file, s)
+        else:
+            error(file, s)
+    elif next[1] == 'EE':
+        EE(file, s + 1)
+    elif next[1] == 'DIF':
+        DIF(file, s + 1)
+    elif next[1] == 'GT':
+        GT(file, s + 1)
+    elif next[1] == 'GE':
+        GE(file, s + 1)
+    elif next[1] == 'LT':
+        LT(file, s + 1)
+    elif next[1] == 'LE':
+        LE(file, s + 1)
+    elif next[1] == 'OR':
+        OR(file, s + 1)
+    elif next[1] == 'ADD':
+        ADD(file, s + 1)
+    elif next[1] == 'SUB':
+        SUB(file, s + 1)
+    elif next[1] == 'MULT':
+        MULT(file, s + 1)
+    elif next[1] == 'DIV':
+        DIV(file, s + 1)
+    elif next[1] == 'SEMICOLON':
+        SEMICOLON(file, s + 1)
+    elif next[1] == 'EQUAL':
+        EQUAL(file, s + 1)
+    else:
+        error(file, s)
+########################################################################################################################
+def OP(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] == 'IF' or lastImportant[len(lastImportant) - 1] == 'WHILE':
+            if next[1] == 'ID':
+                ID(file, s + 1)
+            elif next[1] == 'TRUE':
+                TRUE(file, s + 1)
+            elif next[1] == 'FALSE':
+                FALSE(file, s + 1)
+            elif next[1] == 'NUM - INT':
+                NUM_INT(file, s + 1)
+            elif next[1] == 'NUM - FLOAT':
+                NUM_FLOAT(file, s + 1)
+            else:
+                error(file, s)
+        elif lastImportant[len(lastImportant) - 1] == 'PRINT':
+            if next[1] == 'STRING':
+                STRING(file, s + 1)
+            else:
+                error(file, s)
+        else:
+            error(file, s)
+    else:
+        error(file, s)
+
+def CP(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] == 'IF' or lastImportant[len(lastImportant) - 1] == 'WHILE':
+            if next[1] == 'OCB':
+                OCB(file, s + 1)
+            else:
+                error(file, s)
+        elif lastImportant[len(lastImportant) - 1] == 'PRINT':
+            if next[1] == 'SEMICOLON':
+                SEMICOLON(file, s + 1)
+            else:
+                error(file, s)
+    else:
+        error(file, s)
+
+def SEMICOLON(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] == 'PRINT' or lastImportant[len(lastImportant) - 1] == 'INT'\
+                or lastImportant[len(lastImportant) - 1] == 'FLOAT' or lastImportant[len(lastImportant) - 1] == 'CHAR':
+            lastImportant.pop()
+            if next[1] == 'ID':
+                ID(file, s + 1)
+            elif next[1] == 'INT':
+                INT(file, s + 1)
+            elif next[1] == 'FLOAT':
+                FLOAT(file, s + 1)
+            elif next[1] == 'CHAR':
+                CHAR(file, s + 1)
+            elif next[1] == 'PRINT':
+                PRINTF(file, s + 1)
+            elif next[1] == 'WHILE':
+                WHILE(file, s + 1)
+            elif next[1] == 'IF':
+                IF(file, s + 1)
+            elif next[1] == 'BREAK':
+                BREAK(file, s + 1)
+            elif next[1] == 'CCB':
+                CCB(file, s + 1)
+            elif next[1] == '$':
+                return 0
+            else:
+                error(file, s)
+        else:
+            if next[1] == 'ID':
+                ID(file, s + 1)
+            elif next[1] == 'INT':
+                INT(file, s + 1)
+            elif next[1] == 'FLOAT':
+                FLOAT(file, s + 1)
+            elif next[1] == 'CHAR':
+                CHAR(file, s + 1)
+            elif next[1] == 'PRINT':
+                PRINTF(file, s + 1)
+            elif next[1] == 'WHILE':
+                WHILE(file, s + 1)
+            elif next[1] == 'IF':
+                IF(file, s + 1)
+            elif next[1] == 'BREAK':
+                BREAK(file, s + 1)
+            elif next[1] == 'CCB':
+                CCB(file, s + 1)
+            elif next[1] == '$':
+                return 0
+            else:
+                error(file, s - 1)
+    elif next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'INT':
+        INT(file, s + 1)
+    elif next[1] == 'FLOAT':
+        FLOAT(file, s + 1)
+    elif next[1] == 'CHAR':
+        CHAR(file, s + 1)
+    elif next[1] == 'PRINT':
+        PRINTF(file, s + 1)
+    elif next[1] == 'WHILE':
+        WHILE(file, s + 1)
+    elif next[1] == 'IF':
+        IF(file, s + 1)
+    elif next[1] == 'BREAK':
+        BREAK(file, s + 1)
+    elif next[1] == 'CCB':
+        CCB(file, s + 1)
+    elif next[1] == '$':
+        return 0
+    else:
+        error(file, s - 1)
+
+def OCB(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'INT':
+        INT(file, s + 1)
+    elif next[1] == 'FLOAT':
+        FLOAT(file, s + 1)
+    elif next[1] == 'CHAR':
+        CHAR(file, s + 1)
+    elif next[1] == 'PRINT':
+        PRINTF(file, s + 1)
+    elif next[1] == 'WHILE':
+        WHILE(file, s + 1)
+    elif next[1] == 'IF':
+        IF(file, s + 1)
+    elif next[1] == 'BREAK':
+        BREAK(file, s + 1)
+    elif next[1] == 'CCB':
+        CCB(file, s + 1)
+    else:
+        error(file, s - 1)
+
+def CCB(file, s):
+    global lastImportant
+    next = file[s].split('~')
+    if len(lastImportant) >= 1:                             # Talvez n precise pois pra ter CCB tem q ter  lastImportant
+        if lastImportant[len(lastImportant) - 1] == 'IF':
+            if next[1] != 'ELSE':
+                lastImportant.pop()
+            else:
+                ELSE(file, s + 1)
+        elif next[1] == 'ID':
+            lastImportant.pop()
+            ID(file, s + 1)
+        elif next[1] == 'INT':
+            lastImportant.pop()
+            INT(file, s + 1)
+        elif next[1] == 'FLOAT':
+            lastImportant.pop()
+            FLOAT(file, s + 1)
+        elif next[1] == 'CHAR':
+            lastImportant.pop()
+            CHAR(file, s + 1)
+        elif next[1] == 'PRINT':
+            lastImportant.pop()
+            PRINTF(file, s + 1)
+        elif next[1] == 'WHILE':
+            lastImportant.pop()
+            WHILE(file, s + 1)
+        elif next[1] == 'IF':
+            lastImportant.pop()
+            IF(file, s + 1)
+        elif next[1] == 'BREAK':
+            lastImportant.pop()
+            BREAK(file, s + 1)
+        elif next[1] == '$':
+            return 0
+        else:
+            error(file, s)
+    elif next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'INT':
+        INT(file, s + 1)
+    elif next[1] == 'FLOAT':
+        FLOAT(file, s + 1)
+    elif next[1] == 'CHAR':
+        CHAR(file, s + 1)
+    elif next[1] == 'PRINT':
+        PRINTF(file, s + 1)
+    elif next[1] == 'WHILE':
+        WHILE(file, s + 1)
+    elif next[1] == 'IF':
+        IF(file, s + 1)
+    elif next[1] == 'BREAK':
+        BREAK(file, s + 1)
+    elif next[1] == '$':
+        return 0
+    else:
+        error(file, s)
+
+
+def COMMA(file, s):
+    global lastImportant
+    tokenType = file[s-3].split('~')
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        declarations.append(next[0])
+        types.append(f'{tokenType[1]}~{next[0]}')
+        ID(file, s + 1)
+    else:
+        error(file, s)
+
+######################################### ARITHMETIC OPERATORS #########################################################
+def ADD(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+def SUB(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+def MULT(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+def DIV(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+########################################################################################################################
+
+########################################### LOGICAL OPERATORS ##########################################################
+def EE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'TRUE':
+        TRUE(file, s + 1)
+    elif next[1] == 'FALSE':
+        FALSE(file, s + 1)
+    elif next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def DIF(file, s):
+    next = file[s].split('~')
+    if next[1] == 'TRUE':
+        TRUE(file, s + 1)
+    elif next[1] == 'FALSE':
+        FALSE(file, s + 1)
+    elif next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def EQUAL(file, s):
+    lastToken = file[s-2].split('~')
+    next = file[s].split('~')
+
+    i = 1                               # Guarda os valores de cada ID
+    nextValue = file[s+i].split('~')
+    i += 1
+    value = ''
+    if nextValue[1] != 'SEMICOLON':
+        value += next[0]
+        value += nextValue[0]
+    else:
+        value += next[0]
+    while(nextValue[1] != 'SEMICOLON'):
+        nextValue = file[s+i].split('~')
+        if nextValue[1] != 'SEMICOLON':
+            value += nextValue[0]
+        i += 1
+    values.append(f'{lastToken[0]}~{value}')
+
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'CHAR - VALUE':
+        CHAR_VALUE(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def GE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def GT(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def LE(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def LT(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    else:
+        error(file, s)
+
+def OR(file, s):
+    next = file[s].split('~')
+    if next[1] == 'ID':
+        ID(file, s + 1)
+    elif next[1] == 'NUM - INT':
+        NUM_INT(file, s + 1)
+    elif next[1] == 'NUM - FLOAT':
+        NUM_FLOAT(file, s + 1)
+    elif next[1] == 'TRUE':
+        TRUE(file, s + 1)
+    elif next[1] == 'FALSE':
+        FALSE(file, s + 1)
+    else:
+        error(file, s)
+########################################################################################################################
+
+############################################# ERROR ####################################################################
+def error(file, s):
+    lastToken = file[s-1].split('~')
+    if lastToken[1] == '$':
+        token = file[s-1].split('~')
+    else:
+        token = file[s].split('~')
+    line = token[3].split('\n')[0]
+    print(f'Syntactic error in line: {line} column: {token[2]}')
+    print(f"Error starts in: {token[0]}")
+    os._exit(1)
+########################################################################################################################

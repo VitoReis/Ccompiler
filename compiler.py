@@ -5,7 +5,7 @@ import os
 
 list = os.listdir()
 for file in list:
-    if file == 'lexOutput.txt' or file == 'lexUserOutput.txt':
+    if file == 'lexOutput.txt' or file == 'lexUserOutput.txt' or file == 'exit.txt':
         os.remove(file)
 
 errors = lexical()

@@ -9,17 +9,15 @@ typeOrder = []  # Separa os ids declarados e seus tipos
 def semantic():
     global decOrder, idOrder, valueOrder, printOrder, typeOrder
     error = 0
-    i = 0
-    for item in declarations:                   # Separa os ids e suas posições de declarações dentro de uma lista
-        separated = declarations[i].split('~')
-        decOrder.append(separated)
-        i += 1
 
-    i = 0
+    for item in declarations:                   # Separa os ids e suas posições de declarações dentro de uma lista
+        separated = item.split('~')
+        decOrder.append(separated)
+
+
     for item in idPos:                          # Separa os ids e as posições em que são chamados a primeira vez
-        separated = idPos[i].split('~')
+        separated = item.split('~')
         idOrder.append(separated)
-        i += 1
 
     for id in ids:                              # Verifica os ids chamados foram declarados
         if not id in decID:
@@ -34,30 +32,48 @@ def semantic():
                     print(f"Error starts in: {id[0]}")
                     error += 1
 
-    i = 0
+
     for value in values:                    # Separa os ids declarados e seus valores
-        separated = values[i].split('~')
+        separated = value.split('~')
         valueOrder.append(separated)
-        i += 1
-    print(valueOrder)
 
-    i = 0
+
     for prt in prints:                    # Separa os prints declarados e seus valores e sua posição
-        separated = prints[i].split('~')
+        separated = prt.split('~')
         printOrder.append(separated)
-        i += 1
 
-    i = 0
+
     for id in types:                    # Separa os ids declarados e seus tipos
-        separated = types[i].split('~')
+        separated = id.split('~')
         typeOrder.append(separated)
-        i += 1
-    print(typeOrder)
 
     for typ in typeOrder:           # Salva o id com sua posição e tipo
         for item in idOrder:
             if item[0] == typ[1]:
                 item.append(typ[0])
-    print(idOrder)
+
+    if error == 0:
+        write(decOrder, idOrder, printOrder, valueOrder)
+
     print(f'Semantic finished with {error} errors')
     return error
+
+def write(decOrder, idOrder, printOrder, valueOrder):   # O token é passado e escrito na saida de acordo com a tabela
+    output = open('exit.txt','a')
+    output.write('Declarations:\n')
+    for itens in decOrder:
+        output.write(f'Declarated ID: {itens[0]} - Line: {itens[2]} - Column: {itens[1]}\n')
+
+    output.write('\nID Types:\n')
+
+    for itens in idOrder:
+        output.write(f'ID: {itens[0]} - Type: {itens[3]} - Line: {itens[2]} - Column: {itens[1]}\n')
+
+    output.write('\nPrints:\n')
+    for itens in printOrder:
+        output.write(f'Type: {itens[0]} - Content: {itens[3]} - Line: {itens[2]} - Column: {itens[1]}\n')
+
+    output.write('\nID Values:\n')
+    for itens in valueOrder:
+        output.write(f'ID: {itens[0]} - Value: {itens[3]} - Line: {itens[2]} - Column: {itens[1]}\n')
+    output.close()

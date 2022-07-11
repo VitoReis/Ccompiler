@@ -9,7 +9,7 @@ char z = 'Z';
 printf("Ola");
 float ab = 2.5;
 ab = ab * 69.8;
-c = z + b;
+x = z + b;
 c = c - 1;
 c = c + 2;
 c = c / 5;

@@ -54,14 +54,14 @@ ___
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Esta função recebe como parametros o token, com seu conteudo, linha e coluna, o arquivo e um index para leitura da proxima linha do arquivo, ela então verifica o Token atual e verifica se o proximo Token depois deste esta correto, caso ele esteja nada acontece, caso não esteja retorna um valor verdadeiro para **error** na função MyParser.
 ___
 ## Semantic Analyzer
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_**Em desenvolvimento**_
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;O analisador semantico foi parcialmente implementado dentro do analisador sintatico, ja sua outra parte serve apenas para juntar as informações das listas retiradas durante a execução do analisador sintatico.
 
 ___
 ### OBS:
 * O analisador possui limitações, ele reconhece apenas códigos simples da linguagem C e não possui totas as palavras reservadas e operadores da linguagem original.
 * O que o compilador reconhece:
-  * Palavras reservadas: void, int, float, char, while, printf, true, false, break.
-    * printf serve para strings e para imprimir apenas uma variável
-    * true e false são reconhecidos apenas dentro de um while
+  * Palavras reservadas: void, int, float, char, while, if-else, printf, true, false, break.
+    * printf serve para imprimir apenas strings
+    * true e false são reconhecidos apenas dentro de um while ou if
   * Operações aritméticas: + - * / =
   * Operações logicas: > < >= <= == != ||

@@ -1,5 +1,6 @@
 import os
 
+OCBLIST = []
 lastImportant = []
 ED = ['EE', 'DIF']
 GLE = ['GT', 'LT', 'GE', 'LE', 'OR']
@@ -21,35 +22,68 @@ def myParser():
     token = file[s].split('~')
     if token[1] == 'ID':
         ID(file, s + 1)
-        print(f'Parser finished with 0 errors')
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'INT':
         INT(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'FLOAT':
         FLOAT(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'CHAR':
         CHAR(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'PRINT':
         PRINTF(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'WHILE':
         WHILE(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'IF':
         IF(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == 'BREAK':
         BREAK(file, s + 1)
-        print(f'Parser finished with 0 errors')
-        return 0
+        if len(OCBLIST) >= 1:
+            print(OCBLIST[len(OCBLIST)-1])
+            return 1
+        else:
+            print(f'Parser finished with 0 errors')
+            return 0
     elif token[1] == '$':
         print(f'Parser finished with 0 errors')
         return 0
@@ -212,7 +246,7 @@ def NUM_INT(file, s):
                 DIV(file, s + 1)
             else:
                 error(file, s)
-        elif lastImportant[len(lastImportant) - 1] != 'FLOAT' and lastImportant[len(lastImportant) - 1] != 'INT':
+        elif lastImportant[len(lastImportant) - 1] != 'FLOAT' and lastImportant[len(lastImportant) - 1] != 'INT':   # Parte do Semantico (INICIO/FIM)
             errorS(file, s-1)
         elif next[1] == 'EE':
             EE(file, s + 1)
@@ -296,8 +330,34 @@ def NUM_FLOAT(file, s):
                 DIV(file, s + 1)
             else:
                 error(file, s)
-        elif lastImportant[len(lastImportant) - 1] != 'FLOAT':
+        elif lastImportant[len(lastImportant) - 1] != 'FLOAT':      # Parte do Semantico (INICIO/FIM)
             errorS(file, s - 1)
+        elif next[1] == 'EE':
+            EE(file, s + 1)
+        elif next[1] == 'DIF':
+            DIF(file, s + 1)
+        elif next[1] == 'GT':
+            GT(file, s + 1)
+        elif next[1] == 'GE':
+            GE(file, s + 1)
+        elif next[1] == 'LT':
+            LT(file, s + 1)
+        elif next[1] == 'LE':
+            LE(file, s + 1)
+        elif next[1] == 'OR':
+            OR(file, s + 1)
+        elif next[1] == 'ADD':
+            ADD(file, s + 1)
+        elif next[1] == 'SUB':
+            SUB(file, s + 1)
+        elif next[1] == 'MULT':
+            MULT(file, s + 1)
+        elif next[1] == 'DIV':
+            DIV(file, s + 1)
+        elif next[1] == 'SEMICOLON':
+            SEMICOLON(file, s + 1)
+        else:
+            error(file, s)
     elif next[1] == 'EE':
         EE(file, s + 1)
     elif next[1] == 'DIF':
@@ -328,7 +388,7 @@ def NUM_FLOAT(file, s):
 def CHAR_VALUE(file, s):
     next = file[s].split('~')
     if len(lastImportant) >= 1:
-        if lastImportant[len(lastImportant) - 1] != 'CHAR':
+        if lastImportant[len(lastImportant) - 1] != 'CHAR':         # Parte do Semantico (INICIO/FIM)
             errorS(file, s - 1)
         elif next[1] == 'SEMICOLON':
             SEMICOLON(file, s + 1)
@@ -552,6 +612,12 @@ def SEMICOLON(file, s):
         error(file, s - 1)
 
 def OCB(file, s):
+    global OCBLIST
+
+    thisToken = file[s-1].split('~')
+    line = thisToken[3].split('\n')[0]
+    OCBLIST.append(f'Syntactic error in line: {line} column: {thisToken[2]}')
+
     next = file[s].split('~')
     if next[1] == 'ID':
         ID(file, s + 1)
@@ -575,9 +641,15 @@ def OCB(file, s):
         error(file, s - 1)
 
 def CCB(file, s):
-    global lastImportant
+    global lastImportant,OCBLIST
+
+    if len(OCBLIST) >= 1:
+        OCBLIST.pop()
+    else:
+        error(file, s-1)
+
     next = file[s].split('~')
-    if len(lastImportant) >= 1:                             # Talvez n precise pois pra ter CCB tem q ter  lastImportant
+    if len(lastImportant) >= 1:
         if lastImportant[len(lastImportant) - 1] == 'IF':
             if next[1] != 'ELSE':
                 lastImportant.pop()
@@ -723,22 +795,22 @@ def DIF(file, s):
 def EQUAL(file, s):
     lastToken = file[s-2].split('~')
     next = file[s].split('~')
-
-    i = 1                               # Guarda os valores de cada ID
+                                        # Parte do Semantico (INICIO)
+    value = ''                          # Guarda os valores de cada ID
+    i = 1
     nextValue = file[s+i].split('~')
     i += 1
-    value = ''
+    if next[1] != 'SEMICOLON':
+        value += str(next[0])
     if nextValue[1] != 'SEMICOLON':
-        value += next[0]
-        value += nextValue[0]
-    else:
-        value += next[0]
+        value += str(nextValue[0])
     while(nextValue[1] != 'SEMICOLON'):
         nextValue = file[s+i].split('~')
         if nextValue[1] != 'SEMICOLON':
-            value += nextValue[0]
+            value += str(nextValue[0])
         i += 1
-    values.append(f'{lastToken[0]}~{value}')
+    line = lastToken[3].split('\n')[0]
+    values.append(f'{lastToken[0]}~{lastToken[2]}~{line}~{value}')      # Parte do Semantico (FIM)
 
     if next[1] == 'ID':
         ID(file, s + 1)

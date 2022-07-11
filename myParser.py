@@ -5,11 +5,15 @@ ED = ['EE', 'DIF']
 GLE = ['GT', 'LT', 'GE', 'LE', 'OR']
 AO = ['ADD', 'SUB', 'MULT', 'DIV']
 
-prints = []
-declarations = []
-types = []
-values = []
-ids = []
+prints = []         # Guarda os prints declarados e suas posições e valores
+
+declarations = []   # Guarda os ids declarados com suas posições
+decID = []          # Guarda os ids declarados
+types = []          # Guarda os ids declarados e seus tipos
+operations = []
+values = []         # Guarda os ids chamados e seus valores
+ids = []            # Guarda os ids chamados
+idPos = []          # Guarda os ids chamados e suas posições
 
 def myParser():
     file = open('lexOutput.txt', 'r').readlines()
@@ -60,7 +64,9 @@ def INT(file, s):
     next = file[s].split('~')
     if next[1] == 'ID':
         lastImportant.append('INT')
-        declarations.append(next[0])
+        line = next[3].split('\n')[0]
+        declarations.append(f'{next[0]}~{next[2]}~{line}')
+        decID.append(next[0])
         types.append(f'{thisToken[1]}~{next[0]}')       # Guarda o tipo de cada ID
         ID(file, s + 1)
     else:
@@ -72,8 +78,10 @@ def FLOAT(file, s):
     next = file[s].split('~')
     if next[1] == 'ID':
         lastImportant.append('FLOAT')
-        declarations.append(next[0])
-        types.append(f'{thisToken[1]}~{next[0]}')
+        line = next[3].split('\n')[0]
+        declarations.append(f'{next[0]}~{next[2]}~{line}')
+        decID.append(next[0])
+        types.append(f'{thisToken[1]}~{next[0]}')               # Guarda o tipo de cada ID
         ID(file, s + 1)
     else:
         error(file, s)
@@ -84,8 +92,10 @@ def CHAR(file, s):
     next = file[s].split('~')
     if next[1] == 'ID':
         lastImportant.append('CHAR')
-        declarations.append(next[0])
-        types.append(f'{thisToken[1]}~{next[0]}')
+        line = next[3].split('\n')[0]
+        declarations.append(f'{next[0]}~{next[2]}~{line}')
+        decID.append(next[0])
+        types.append(f'{thisToken[1]}~{next[0]}')  # Guarda o tipo de cada ID
         ID(file, s + 1)
     else:
         error(file, s)
@@ -202,6 +212,8 @@ def NUM_INT(file, s):
                 DIV(file, s + 1)
             else:
                 error(file, s)
+        elif lastImportant[len(lastImportant) - 1] != 'FLOAT' and lastImportant[len(lastImportant) - 1] != 'INT':
+            errorS(file, s-1)
         elif next[1] == 'EE':
             EE(file, s + 1)
         elif next[1] == 'DIF':
@@ -284,35 +296,9 @@ def NUM_FLOAT(file, s):
                 DIV(file, s + 1)
             else:
                 error(file, s)
-        if lastImportant[len(lastImportant) - 1] == 'INT' or lastImportant[len(lastImportant) - 1] == 'FLOAT'\
-            or lastImportant[len(lastImportant) - 1] == 'CHAR':
-            if next[1] == 'EE':
-                EE(file, s + 1)
-            elif next[1] == 'DIF':
-                DIF(file, s + 1)
-            elif next[1] == 'GT':
-                GT(file, s + 1)
-            elif next[1] == 'GE':
-                GE(file, s + 1)
-            elif next[1] == 'LT':
-                LT(file, s + 1)
-            elif next[1] == 'LE':
-                LE(file, s + 1)
-            elif next[1] == 'OR':
-                OR(file, s + 1)
-            elif next[1] == 'ADD':
-                ADD(file, s + 1)
-            elif next[1] == 'SUB':
-                SUB(file, s + 1)
-            elif next[1] == 'MULT':
-                MULT(file, s + 1)
-            elif next[1] == 'DIV':
-                DIV(file, s + 1)
-            elif next[1] == 'SEMICOLON':
-                SEMICOLON(file, s + 1)
-            else:
-                error(file, s)
-    if next[1] == 'EE':
+        elif lastImportant[len(lastImportant) - 1] != 'FLOAT':
+            errorS(file, s - 1)
+    elif next[1] == 'EE':
         EE(file, s + 1)
     elif next[1] == 'DIF':
         DIF(file, s + 1)
@@ -341,16 +327,20 @@ def NUM_FLOAT(file, s):
 
 def CHAR_VALUE(file, s):
     next = file[s].split('~')
-    if next[1] == 'SEMICOLON':
+    if len(lastImportant) >= 1:
+        if lastImportant[len(lastImportant) - 1] != 'CHAR':
+            errorS(file, s - 1)
+        elif next[1] == 'SEMICOLON':
+            SEMICOLON(file, s + 1)
+        else:
+            error(file, s)
+    elif next[1] == 'SEMICOLON':
         SEMICOLON(file, s + 1)
     else:
         error(file, s)
 
 def STRING(file, s):
-    # thisToken = file[s-1].split('~')
-    # string = thisToken[0].split('"')
     next = file[s].split('~')
-    # prints.append(f'print~{string[1]}')
     if next[1] == 'CP':
         CP(file, s + 1)
     else:
@@ -361,9 +351,10 @@ def ID(file, s):
     global lastImportant
     thisId = file[s-1].split('~')
     next = file[s].split('~')
-
-    if not thisId[0] in ids:            # Guarda todos os IDs junto a sua linha e coluna
-        ids.append(f'{thisId[0]}~{thisId[2]}~{thisId[3]}')
+    line = thisId[3].split('\n')[0]
+    if not thisId[0] in ids:
+        ids.append(thisId[0])
+        idPos.append(f'{thisId[0]}~{thisId[2]}~{line}')
 
     if len(lastImportant) >= 1:
         if lastImportant[len(lastImportant)-1] == 'PRINT':
@@ -647,8 +638,10 @@ def COMMA(file, s):
     tokenType = file[s-3].split('~')
     next = file[s].split('~')
     if next[1] == 'ID':
-        declarations.append(next[0])
-        types.append(f'{tokenType[1]}~{next[0]}')
+        line = next[3].split('\n')[0]
+        declarations.append(f'{next[0]}~{next[2]}~{line}')
+        decID.append(next[0])
+        types.append(f'{tokenType[1]}~{next[0]}')               # Guarda o tipo de cada ID
         ID(file, s + 1)
     else:
         error(file, s)
@@ -827,6 +820,17 @@ def error(file, s):
         token = file[s].split('~')
     line = token[3].split('\n')[0]
     print(f'Syntactic error in line: {line} column: {token[2]}')
+    print(f"Error starts in: {token[0]}")
+    os._exit(1)
+
+def errorS(file, s):
+    lastToken = file[s-1].split('~')
+    if lastToken[1] == '$':
+        token = file[s-1].split('~')
+    else:
+        token = file[s].split('~')
+    line = token[3].split('\n')[0]
+    print(f'Semantic error in line: {line} column: {token[2]}')
     print(f"Error starts in: {token[0]}")
     os._exit(1)
 ########################################################################################################################

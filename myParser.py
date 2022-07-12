@@ -15,6 +15,7 @@ operations = []
 values = []         # Guarda os ids chamados e seus valores
 ids = []            # Guarda os ids chamados
 idPos = []          # Guarda os ids chamados e suas posições
+conditions = []     # Guarda as condições de cada while
 
 def myParser():
     file = open('lexOutput.txt', 'r').readlines()
@@ -153,6 +154,7 @@ def BREAK(file, s):
 def WHILE(file, s):
     global lastImportant
     next = file[s].split('~')
+
     if next[1] == 'OP':
         lastImportant.append('WHILE')
         OP(file, s + 1)
@@ -497,6 +499,24 @@ def OP(file, s):
     next = file[s].split('~')
     if len(lastImportant) >= 1:
         if lastImportant[len(lastImportant) - 1] == 'IF' or lastImportant[len(lastImportant) - 1] == 'WHILE':
+
+            lastToken = file[s - 2].split('~')          # Parte do Semantico (INICIO)
+            value = ''                                  # Guarda as condições de cada while
+            i = 1
+            nextValue = file[s + i].split('~')
+            i += 1
+            if next[1] != 'CP':
+                value += str(next[0])
+            if nextValue[1] != 'CP':
+                value += str(nextValue[0])
+            while (nextValue[1] != 'CP'):
+                nextValue = file[s + i].split('~')
+                if nextValue[1] != 'CP':
+                    value += str(nextValue[0])
+                i += 1
+            line = lastToken[3].split('\n')[0]
+            conditions.append(f'{lastToken[0]}~{lastToken[2]}~{line}~{value}')  # Parte do Semantico (FIM)
+
             if next[1] == 'ID':
                 ID(file, s + 1)
             elif next[1] == 'TRUE':
